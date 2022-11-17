@@ -43,6 +43,8 @@
             \newacronym{aae}{AAE}{\textit{adversarial autoencoder}}
             \newacronym{dae}{DAE}{\textit{denoising autoencoder}}
             \newacronym{sae}{SAE}{\textit{stacked autoencoder}}
+            \newacronym{elbo}{ELBO}{límit inferior de la evidència (\textit{evidenve lower bound})}
+            \newacronym{kl}{KL}{Kullback-Leibler}
 
         %Insert names of references with \cref{}
         \usepackage[catalan,noabbrev,nameinlink]{cleveref}
@@ -62,6 +64,9 @@
             \begin{tcolorbox}[title=ToDo!, colback=red!5!white, colframe=red!50!black, coltext=red!50!black]
             #1
             \end{tcolorbox}}
+
+        %Provides \mathbb{}
+        \usepackage{amsfonts}
 
 %        %Insert sideways figure
 %        \usepackage{rotating}
@@ -307,7 +312,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         Optimitzant els paràmetres d'ambdues parts conjuntament durant l'entrenament de la xarxa es busca aconseguir que el codificador sigui capaç de comprimir la entrada mantenint el màxim d'informació. Aplicant la idea de \gls{fl}, el codi esdevé la \gls{rl}.
 
-        Per aconseguir un \textit{clustering} eficaç, no és suficient amb aquesta optimització ja si no s'aplica cap restricció a la \gls{rl} podria donar lloc a \gls{lf} que no permeten una bona \gls{cq}. Per resoldre aquest problema es defineixen dos tipus de funció de pèrdua, que s'optimitzen conjuntament durant l'entrenament \citep{Min2018}:
+        Per aconseguir un \textit{clustering} eficaç, no és suficient amb aquesta optimització ja que si no s'aplica cap restricció a la \gls{rl} podria donar lloc a \gls{lf} que no permeten una bona \gls{cq}. Per resoldre aquest problema es defineixen dos tipus de funció de pèrdua, que s'optimitzen conjuntament durant l'entrenament \citep{Min2018}:
         \begin{itemize}
             \item La \textbf{funció de pèrdua auxiliar}, que depèn de la capacitat del codificador d'obtenir una \gls{rl} eficient que permeti que el descodificador sigui capaç de regenerar l'entrada. Garanteix obtenir \gls{lf} rellevants.
             \item La \textbf{funció de pèrdua de \textit{clustering}}, que depèn de l'algoritme de \textit{clustering} i de que les \gls{lf} obtingudes siguin adequades per realitzar \textit{clustering}. Assegura obtenir una bona \gls{cq}.
@@ -341,19 +346,193 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     %\end{itemize}
     %\textbf{L’estructuració dels capítols pot variar segons el tipus de treball.}
 
-    \section{Variational Autoencoder}
-    \label{s:vae}
+    \section{Model de \textit{deep clustering}}
+    \label{s:metodes_dc}
 
-        \paragraph{Selecció d'una tècnica de \textit{deep clustering}.}
+    En aquest \gls{tfm}
+    es pretén implementar un model de \textit{deep clustering} en dades metabòliques.
+    Com s'ha descrit a les \cref{s:state_deep,s:state_ae},
+    existeix una gran varietat d'arquitectures de xarxes neuronals descrites a la literatura.
+    Intentar estudiar totes les possibilitats seria inabastable donat el temps disponible,
+    pel que ha sigut necessari acotar l'estudi a una única arquitectura.
+    S'ha decidit implementar una aproximació basada en \gls{vae},
+    donat que presenta algunes característiques interessants.
 
-            Al revisar el \textit{state-of-the-art} en relació amb els mètodes de \textit{clustering} basats \textit{deep learning} que s'apliquen a la bioinformàtica s'ha trobat que existeix una gran varietat de tècniques utilitzades \citep{Min2018, Karim2021, Masood2015}.
+    Com s'ha mencionat a la \cref{s:state_ae},
+    l'arquitectura \gls{vae} és una implementació específica de \gls{ae}
+    basada en mètodes Bayesians.
+    Això li atorga al model certa robustesa estadística
+    que no trobem en altres arquitectures.
+    A més,
+    la \gls{rl} apresa permet la generació de mostres artificials
+    similars a les dades d'entrenament.
+    Això últim pot resultar útil com a tècnica d'augment de dades.
 
-            Intentar estudiar totes les possibilitats seria inabastable donat el temps disponible per realitzar aquest TFM, pel que serà imprescindible acotar l'estudi a alguna tècnica concreta. S'ha decidit utilitzar una aproximació basada en \textit{Variational Autoencoders} \citep{Kingma2019}, donat que aquesta tècnica presenta algunes característiques interessants:
+    \subsection{Variational Autoencoder}
+    \label{s:metodes_vae}
+
+        A continuació es fa una breu presentació del model \gls{vae},
+        basada en les referències \citep{Kingma2014,Kingma2019}.
+        No s'entrarà en profunditat en les explicacions matemàtiques.
+        Per una explicació més detallada es recomana llegir les fonts originals.
+
+        En l'arquitectura \gls{ae},
+        el codificador aprèn una representació de l'entrada $\mathbf{x}$
+        en un espai dimensional reduït $\mathbf{z}$
+        aplicant una transformació no lineal.
+        Des de la perspectiva de \gls{fl},
+        aquest espai reduït es correspon amb la \gls{rl}.
+        El descodificador aprèn a reconstruir $\mathbf{x}$ a partir de $\mathbf{z}$
+        aplicant una segona transformació no lineal.
+        L'entrenament de les dues parts conjuntament
+        aconsegueix que les \gls{lf} siguin una bona representació de les dades originals.
+
+        En l'aproximació que pren el \gls{vae},
+        s'assumeix que l'entrada $\mathbf{x}$ és un conjunt d'observacions de variables aleatòries,
+        que provenen d'un procés desconegut
+        amb una distribució $p^*(\mathbf{x})$.
+        Aquesta distribució és desconeguda,
+        de manera que intentem aproximar-la amb un model $p_\theta(\mathbf{x})$,
+        on $\theta$ són els paràmetres del model.
+
+        L'espai $\mathbf{z}$ es considera un conjunt de variables latents del model
+        que segueixen una distribució $p_\theta(\mathbf{z})$.
+        Les variables latents són variables que estan presents al model però no observem en les dades.
+        Podem escollir que aquesta distribució sigui coneguda,
+        per exemple una barreja de gaussianes.
+
+        Sota aquesta premissa,
+        el model a inferir és sobre una distribució conjunta $p_\theta(\mathbf{x,z})$
+        de les variables observades i latents.
+        L'objectiu del codificador és aprendre els paràmetres $\theta$
+        de la distribució $p_\theta(\mathbf{z|x})$
+        (la distribució posterior de $\mathbf{z}$ condicionada a $\mathbf{x}$)
+        De la mateixa manera,
+        l'objectiu del descodificador és aprendre els paràmetres $\theta$
+        de la distribució $p_\theta(\mathbf{x|z})$.
+
+\todo{Inserir imatge $p(x) \rightarrow q(z|x) \rightarrow p(z) \rightarrow p(x|z)$}
+
+        \subsubsection{Optimització dels paràmetres}
+        \label{s:vae_parametres}
+
+            El codificador pretén aprendre els paràmetres $\theta$ òptims
+            de la distribució $p_\theta(\mathbf{z|x})$.
+            Aquesta distribució bé condicionada per la distribució marginal $p_\theta(\mathbf{x})$
+            en la equació:
+            \begin{equation}
+            \label{eq:cond_p_z_on_x}
+                p_\theta(\mathbf{z|x}) =
+                \frac {p_\theta(\mathbf{x,z})}
+                      {p_\theta(\mathbf{x})}
+            \end{equation}
+
+            Aquesta distribució marginal bé donada per:
+            \begin{equation}
+            \label{eq:marginal_p_x}
+                p_\phi(\mathbf{x}) = \int p_\phi(\mathbf{x, z}) d\mathbf{z}
+            \end{equation}
+
+            La integral en la \cref{eq:marginal_p_x} provoca que
+            la distribució marginal $p_\theta(\mathbf{x})$ no tingui un estimador eficient
+            i sigui intractable computacionalment.
+            Això provoca que no es pugui diferenciar respecte als paràmetres $\theta$
+            i optimitzar-la pel mètode del descens de gradients.
+            En conseqüència,
+            tampoc es poden optimitzar els paràmetres de la distribució $p_\theta(\mathbf{z|x})$.
+
+            En el seu lloc,
+            podem inferir un model $q_\phi(\mathbf{z|x})$
+            que aproximi la distribució intractable $p_\theta(\mathbf{z|x})$,
+            on els paràmetres $\phi$ s'aprenen a través de la optimització
+            dels pesos i biaixos de la xarxa neuronal.
+
+        \subsubsection{El terme \acrshort{elbo}}
+        \label{s:vae_elbo}
+
+            Per optimitzar els paràmetres del \gls{vae}
+            s'utilitza un terme anomenat \gls{elbo}:
+
+            \begin{equation}
+            \label{eq:elbo}
+                \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
+                \mathbb{E}_{q_\phi(\mathbf{z|x})} [
+                    \log p_\theta(\mathbf{x,z}) -
+                    \log q_\phi(\mathbf{z|x})
+                ]
+            \end{equation}
+
+            Aquest terme es relaciona amb la distribució marginal $p_\theta(\mathbf{x})$ per la igualtat:
+
+            \begin{equation}
+            \label{eq:elbo_kl}
+                \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
+                \log p_\theta(\mathbf{x}) -
+                D_{KL} (
+                    q_\phi(\mathbf{z|x}) \|
+                    p_\theta(\mathbf{z|x})
+                )
+            \end{equation}
+
+            On el terme $D_{KL} ( q_\phi(\mathbf{z|x}) \| p_\theta(\mathbf{x|z} )$
+            és la divergència de \gls{kl}
+            entre $q_\phi(\mathbf{z|x})$ i $p_\theta(\mathbf{x|z})$.
+            Aquest terme és sempre no-negatiu
+            i és zero si i només si $q_\phi(\mathbf{z|x}) = p_\theta(\mathbf{z|x})$.
+
+            Per tant, el terme \gls{elbo} és el limit inferior de $\log p_\theta(\mathbf{x})$:
+
+            \begin{equation}
+            \label{eq:elbo_lim}
+                \mathcal{L}_{\theta,\phi}(\mathbf{x}) \le
+                \log p_\theta(\mathbf{x})
+            \end{equation}
+
+            En conseqüència, maximitzant el terme \gls{elbo}
+            amb respecte als paràmetres $\phi$ i $\theta$
+            s'aconsegueix optimitzar dues característiques:
 
             \begin{itemize}
-                \item Es basa en models probabilístics Bayesians, el que els atorga certa robustesa matemàtica o facilita la interpretació del model.
-                \item Permet la generació de mostres artificials, el que pot resultar útil en aplicacions bioinformàtiques en les que es disposa de poques mostres.
+                \item Minimitzar la divergència de \gls{kl}
+                entre $q_\phi(\mathbf{z|x})$ i $p_\theta(\mathbf{z|x})$,
+                de manera s'aconsegueix millorar $q_\phi(\mathbf{z|x})$
+                i el codificador obté una millor representació.
+
+                \item Maximitzar la distribució marginal $p_\theta(\mathbf{x})$,
+                de manera que el codificador aconsegueix
+                una millor reconstrucció.
             \end{itemize}
+
+        \subsubsection{Reparametrització}
+        \label{s:vae_reparametritzacio}
+
+\todo{
+    Explicar el reparametrization trick
+    en funció del descens de gradients
+    i les transformacions deterministes
+    vs el soroll aleatori.
+    No intentar entrar l'explicació matemàtica
+    ja que s'ha d'entrar en massa detall per què tingui sentit.
+ }
+
+            El terme \gls{elbo} es pot optimitzar
+            amb respecte als paràmetres $\phi$ i $\theta$
+            mitjançant el descens de gradients.
+            Els gradients respecte als paràmetres $\phi$
+            es poden obtenir mitjançant un estimador simple
+            (de nou, no s'entra en detall en l'explicació).
+
+            Per contra, els gradients respecte als paràmetres $\theta$
+            són difícils de computar
+            i es requereix realitzar una reparametrització,
+            és a dir un canvi de variables.
+
+
+
+
+    \section{Clustering loss?}
+    \label{s:??}
+
 
     \section{Evauation metrics?}
     \label{s:???}
