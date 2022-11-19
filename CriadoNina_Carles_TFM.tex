@@ -312,13 +312,13 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         Optimitzant els paràmetres d'ambdues parts conjuntament durant l'entrenament de la xarxa es busca aconseguir que el codificador sigui capaç de comprimir la entrada mantenint el màxim d'informació. Aplicant la idea de \gls{fl}, el codi esdevé la \gls{rl}.
 
-        Per aconseguir un \textit{clustering} eficaç, no és suficient amb aquesta optimització ja que si no s'aplica cap restricció a la \gls{rl} podria donar lloc a \gls{lf} que no permeten una bona \gls{cq}. Per resoldre aquest problema es defineixen dos tipus de funció de pèrdua, que s'optimitzen conjuntament durant l'entrenament \citep{Min2018}:
+        Per aconseguir un \textit{clustering} eficaç, no és suficient amb aquesta optimització ja que si no s'aplica cap restricció a la \gls{rl} podria donar lloc a \gls{lf} que no permeten una bona \gls{cq}. Per resoldre aquest problema es defineixen dos tipus de funció de cost, que s'optimitzen conjuntament durant l'entrenament \citep{Min2018}:
         \begin{itemize}
-            \item La \textbf{funció de pèrdua auxiliar}, que depèn de la capacitat del codificador d'obtenir una \gls{rl} eficient que permeti que el descodificador sigui capaç de regenerar l'entrada. Garanteix obtenir \gls{lf} rellevants.
-            \item La \textbf{funció de pèrdua de \textit{clustering}}, que depèn de l'algoritme de \textit{clustering} i de que les \gls{lf} obtingudes siguin adequades per realitzar \textit{clustering}. Assegura obtenir una bona \gls{cq}.
+            \item La \textbf{funció de cost auxiliar}, que depèn de la capacitat del codificador d'obtenir una \gls{rl} eficient que permeti que el descodificador sigui capaç de regenerar l'entrada. Garanteix obtenir \gls{lf} rellevants.
+            \item La \textbf{funció de cost de \textit{clustering}}, que depèn de l'algoritme de \textit{clustering} i de que les \gls{lf} obtingudes siguin adequades per realitzar \textit{clustering}. Assegura obtenir una bona \gls{cq}.
         \end{itemize}
 
-        L'aproximació més bàsica de l'arquitectura \gls{ae} es pot construir utilitzant \glspl{mlp} simètrics pel codificador i descodificador. Encara que és fàcil d'implementar, el model generat conté un gran nombre d'hiperparàmetres i esdevé difícil d'optimitzar i balancejar les dues funcions de pèrdua \citep{Karim2021}. A més, no s'aplica cap restricció a la funció de representació i per tant no garanteix obtenir una bona \gls{cq}.
+        L'aproximació més bàsica de l'arquitectura \gls{ae} es pot construir utilitzant \glspl{mlp} simètrics pel codificador i descodificador. Encara que és fàcil d'implementar, el model generat conté un gran nombre d'hiperparàmetres i esdevé difícil d'optimitzar i balancejar les dues funcions de cost \citep{Karim2021}. A més, no s'aplica cap restricció a la funció de representació i per tant no garanteix obtenir una bona \gls{cq}.
 
         A la literatura s'han descrit diferents aproximacions a la idea del \gls{ae}, que prenen com a base altres arquitectures. Algunes d'aquestes aproximacions permeten aconseguir un model generatiu, que és capaç de generar dades similars a les d'entrenament. Alguns d'aquestes aproximacions són:
 
@@ -348,6 +348,13 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
     \section{Model de \textit{deep clustering}}
     \label{s:metodes_dc}
+
+\todo{
+    \begin{itemize}
+        \item Mencionar figures al text.
+        \item Figura 3.3: buscar figura on es representin les funcions de cost.
+    \end{itemize}
+}
 
     En aquest \gls{tfm}
     es pretén implementar un model de \textit{deep clustering} en dades metabòliques.
@@ -411,277 +418,396 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         l'objectiu del descodificador és aprendre els paràmetres $\theta$
         de la distribució $p_\theta(\mathbf{x|z})$.
 
-\todo{Inserir imatge $p(x) \rightarrow q(z|x) \rightarrow p(z) \rightarrow p(x|z)$}
+        \begin{figure}[htpb]
+            \centering
+            \includegraphics{kingma2019_vae.png}
+            \caption{
+                Esquema del model \gls{vae}.
+                Les dades observades $\mathbf{D}$ (\textit{dataset})
+                són una mostra d'unes variables de l'espai $\mathbf{x}$,
+                que segueix una distribució intractable.
+                L'espai latent $\mathbf{z}$ s'escull que segueixi
+                una distribució $p_\phi(\mathbf{z})$ fàcil de computar.
+                El codificador (\textit{encoder})
+                troba la distribució condicional de $\mathbf{z}$ donada $\mathbf{x}$,
+                aconseguint una representació de les mostres a l'espai latent.
+                El decodificador (\textit{decoder})
+                troba la distribució condicional de $\mathbf{x}$ donada $\mathbf{z}$,
+                aconseguint la reconstrucció de les dades a partir de l'espai latent.
+                Font: Kingma and Welling, 2019 \citep{Kingma2019}
+            }
+            \label{fig:vae_kingma}
+        \end{figure}
 
-        \subsection{Optimització dels paràmetres}
-        \label{s:vae_optimitzacio}
+    \subsection{Optimització dels paràmetres}
+    \label{s:vae_optimitzacio}
 
-            El codificador pretén aprendre els paràmetres $\theta$ òptims
-            de la distribució $p_\theta(\mathbf{z|x})$,
-            que està condicionada per la distribució marginal $p_\theta(\mathbf{x})$
-            segons la equació:
-            \begin{equation}
-            \label{eq:cond_p_z_on_x}
-                p_\theta(\mathbf{z|x}) =
-                \frac {p_\theta(\mathbf{x,z})}
-                      {p_\theta(\mathbf{x})}
-            \end{equation}
+        El codificador pretén aprendre els paràmetres $\theta$ òptims
+        de la distribució $p_\theta(\mathbf{z|x})$,
+        que està condicionada per la distribució marginal $p_\theta(\mathbf{x})$
+        segons la equació:
+        \begin{equation}
+        \label{eq:cond_p_z_on_x}
+            p_\theta(\mathbf{z|x}) =
+            \frac {p_\theta(\mathbf{x,z})}
+                  {p_\theta(\mathbf{x})}
+        \end{equation}
 
-            Aquesta distribució marginal en el model bé donada per:
-            \begin{equation}
-            \label{eq:marginal_p_x}
-                p_\phi(\mathbf{x}) = \int p_\phi(\mathbf{x, z}) d\mathbf{z}
-            \end{equation}
+        Aquesta distribució marginal en el model bé donada per:
+        \begin{equation}
+        \label{eq:marginal_p_x}
+            p_\phi(\mathbf{x}) = \int p_\phi(\mathbf{x, z}) d\mathbf{z}
+        \end{equation}
 
-            La integral en la \cref{eq:marginal_p_x} provoca que
-            la distribució marginal $p_\theta(\mathbf{x})$ no tingui un estimador eficient
-            i sigui intractable computacionalment.
-            Això provoca que no es pugui diferenciar respecte als paràmetres $\theta$
-            i optimitzar-la pel mètode del descens de gradients.
-            En conseqüència,
-            tampoc es poden optimitzar els paràmetres de la distribució $p_\theta(\mathbf{z|x})$.
+        La integral en la \cref{eq:marginal_p_x} provoca que
+        la distribució marginal $p_\theta(\mathbf{x})$ no tingui un estimador eficient
+        i sigui intractable computacionalment.
+        Això provoca que no es pugui diferenciar respecte als paràmetres $\theta$
+        i optimitzar-la pel mètode del descens de gradients.
+        En conseqüència,
+        tampoc es poden optimitzar els paràmetres de la distribució $p_\theta(\mathbf{z|x})$.
 
-            En el seu lloc,
-            es pot inferir un model $q_\phi(\mathbf{z|x})$
-            que aproximi la distribució intractable $p_\theta(\mathbf{z|x})$,
-            on els paràmetres $\phi$ s'aprenen a través de la optimització
-            dels pesos i biaixos de la xarxa neuronal.
+        En el seu lloc,
+        es pot inferir un model $q_\phi(\mathbf{z|x})$
+        que aproximi la distribució intractable $p_\theta(\mathbf{z|x})$,
+        on els paràmetres $\phi$ s'aprenen a través de la optimització
+        dels pesos i biaixos de la xarxa neuronal.
 
-            La diferència entre aquestes dues distribucions
-            es pot calcular mitjançant la divergència de \gls{kl}:
-            $D_{KL} ( q_\phi(\mathbf{z|x}) \| p_\theta(\mathbf{z|x}) )$.
-            L'objectiu és minimitzar aquesta divergència,
-            però no és possible calcular-la directament
-            donada la intractabilitat de $p_\theta(\mathbf{z|x})$.
+        La diferència entre aquestes dues distribucions
+        es pot calcular mitjançant la divergència de \gls{kl}:
+        $D_{KL} ( q_\phi(\mathbf{z|x}) \| p_\theta(\mathbf{z|x}) )$.
+        L'objectiu és minimitzar aquesta divergència,
+        però no és possible calcular-la directament
+        donada la intractabilitat de $p_\theta(\mathbf{z|x})$.
 
-            Aquesta divergència es relaciona amb la distribució marginal
-            segons la següent igualtat:
+        Aquesta divergència es relaciona amb la distribució marginal
+        segons la següent igualtat:
 
-            \begin{equation}
-                \label{eq:kl}
-                \log p_\theta(\mathbf{x}) =
-                \mathcal{L}_{\theta,\phi}(\mathbf{x}) +
-                D_{KL} (
-                q_\phi(\mathbf{z|x}) \|
-                p_\theta(\mathbf{z|x})
-                )
-            \end{equation}
+        \begin{equation}
+            \label{eq:kl}
+            \log p_\theta(\mathbf{x}) =
+            \mathcal{L}_{\theta,\phi}(\mathbf{x}) +
+            D_{KL} (
+            q_\phi(\mathbf{z|x}) \|
+            p_\theta(\mathbf{z|x})
+            )
+        \end{equation}
 
-            Per tant, es pot minimitzar la divergència maximitzant el terme $\mathcal{L}_{\theta,\phi}(\mathbf{x})$.
-            Aquest terme s'anomena \gls{elbo}
-            ja que la divergència \gls{kl} és sempre no negativa i
-            per tant \gls{elbo} és el límit inferior de $\log p_\theta(\mathbf{x})$
-            (evidència de $\mathbf{x}$):
+        Per tant, es pot minimitzar la divergència maximitzant el terme $\mathcal{L}_{\theta,\phi}(\mathbf{x})$.
+        Aquest terme s'anomena \gls{elbo}
+        ja que la divergència \gls{kl} és sempre no negativa i
+        per tant \gls{elbo} és el límit inferior de $\log p_\theta(\mathbf{x})$
+        (evidència de $\mathbf{x}$):
 
-            \begin{equation}
-                \label{eq:lim_inf}
-                \log p_\theta(\mathbf{x}) \ge
-                \mathcal{L}_{\theta,\phi}(\mathbf{x})
-            \end{equation}
+        \begin{equation}
+            \label{eq:lim_inf}
+            \log p_\theta(\mathbf{x}) \ge
+            \mathcal{L}_{\theta,\phi}(\mathbf{x})
+        \end{equation}
 
-            El terme \gls{elbo} es calcula segons la següent equació:
+        El terme \gls{elbo} es calcula segons la següent equació:
 
-            \begin{equation}
-            \label{eq:elbo}
-                \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
-                \mathbb{E}_{q_\phi(\mathbf{z|x})}
-                    [ \log p_\theta(\mathbf{x|z}) ] -
-                \mathbb{E}_{q_\phi(\mathbf{z|x})} \left[
-                    \log \frac {q_\phi(\mathbf{z|x})}
-                               {p_\theta(\mathbf{z})}
-                \right]
-            \end{equation}
+        \begin{equation}
+        \label{eq:elbo}
+            \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
+            \mathbb{E}_{q_\phi(\mathbf{z|x})}
+                [ \log p_\theta(\mathbf{x|z}) ] -
+            \mathbb{E}_{q_\phi(\mathbf{z|x})} \left[
+                \log \frac {q_\phi(\mathbf{z|x})}
+                           {p_\theta(\mathbf{z})}
+            \right]
+        \end{equation}
 
-            La maximització del \gls{elbo} implica:
-            \begin{itemize}
-                \item Maximitzar el primer terme de la equació,
-                la esperança de $\log p_\theta(\mathbf{x|z})$,
-                que es correspon amb optimitzar els paràmetres del descodificador.
-                És a dir, s'aconsegueix una millor reconstrucció.
+        La maximització del \gls{elbo} implica:
+        \begin{itemize}
+            \item Maximitzar el primer terme de la equació,
+            la esperança de $\log p_\theta(\mathbf{x|z})$,
+            que es correspon amb optimitzar els paràmetres del descodificador.
+            És a dir, s'aconsegueix una millor reconstrucció.
 
-                \item Minimitzar el segon terme,
-                la esperança de $\log ( q_\phi(\mathbf{z|x}) / p_\theta(\mathbf{z}) )$,
-                que és la divergència \gls{kl} entre
-                la distribució inferida pel codificador $q_\phi(\mathbf{z|x})$
-                i la distribució $p_\theta(\mathbf{z})$ fixada de l'espai latent.
-                És a dir, s'aconsegueix millorar la representació obtinguda pel codificador.
-            \end{itemize}
+            \item Minimitzar el segon terme,
+            la esperança de $\log ( q_\phi(\mathbf{z|x}) / p_\theta(\mathbf{z}) )$,
+            que és la divergència \gls{kl} entre
+            la distribució inferida pel codificador $q_\phi(\mathbf{z|x})$
+            i la distribució $p_\theta(\mathbf{z})$ fixada de l'espai latent.
+            És a dir, s'aconsegueix millorar la representació obtinguda pel codificador.
+        \end{itemize}
 
-        \subsection{Descens de gradients}
-        \label{s:vae_gradients}
+    \subsection{Descens de gradients}
+    \label{s:vae_gradients}
 
-            Per optimitzar els paràmetres de la xarxa neuronal
-            de tal manera que es maximitzi el \gls{elbo},
-            s'utilitza el descens de gradients.
-            Per tant, cal calcular els gradients del \gls{elbo}
-            amb respecte als paràmetres $\theta$ i $\phi$.
+        Per optimitzar els paràmetres de la xarxa neuronal
+        de tal manera que es maximitzi el \gls{elbo},
+        s'utilitza el descens de gradients.
+        Per tant, cal calcular els gradients del \gls{elbo}
+        amb respecte als paràmetres $\theta$ i $\phi$.
 
-            El \gls{elbo} es pot reformular de la següent manera,
-            el que facilitarà el càlcul dels gradients:
+        El \gls{elbo} es pot reformular de la següent manera,
+        el que facilitarà el càlcul dels gradients:
 
-            \begin{equation}
-            \label{eq:elbo_2}
-                \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
-                \mathbb{E}_{q_\phi(\mathbf{z|x})} [
-                    \log p_\theta(\mathbf{x,z}) -
-                    \log q_\phi(\mathbf{z|x})
-                ]
-            \end{equation}
-
-            I els gradients es calculen segons:
-
-            \begin{equation}
-            \label{eq:gradient_theta}
-                \nabla_\theta \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
-                \nabla_\theta \mathbb{E}_{q_\phi(\mathbf{z|x})} [
+        \begin{equation}
+        \label{eq:elbo_2}
+            \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
+            \mathbb{E}_{q_\phi(\mathbf{z|x})} [
                 \log p_\theta(\mathbf{x,z}) -
                 \log q_\phi(\mathbf{z|x})
-                ]
-            \end{equation}
-            \begin{equation}
-            \label{eq:gradient_phi}
-                \nabla_\phi \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
-                \nabla_\phi \mathbb{E}_{q_\phi(\mathbf{z|x})} [
+            ]
+        \end{equation}
+
+        I els gradients es calculen segons:
+
+        \begin{equation}
+        \label{eq:gradient_theta}
+            \nabla_\theta \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
+            \nabla_\theta \mathbb{E}_{q_\phi(\mathbf{z|x})} [
+            \log p_\theta(\mathbf{x,z}) -
+            \log q_\phi(\mathbf{z|x})
+            ]
+        \end{equation}
+        \begin{equation}
+        \label{eq:gradient_phi}
+            \nabla_\phi \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
+            \nabla_\phi \mathbb{E}_{q_\phi(\mathbf{z|x})} [
+            \log p_\theta(\mathbf{x,z}) -
+            \log q_\phi(\mathbf{z|x})
+            ]
+        \end{equation}
+
+        Per la regla de la integral de Leibniz, el gradient en la \cref{eq:gradient_theta} es pot moure a dins de la esperança i això permet la seva computació. Però el mateix no és possible en la \cref{eq:gradient_phi}, ja que l'esperança està en funció de $\phi$.
+
+        Per resoldre aquest problema es planteja la següent solució:
+        reparametritzar la variable $\mathbf{z} \sim q_\theta(\mathbf{z|x})$
+        com una funció d'una altra variable aleatòria $\epsilon$, donades $\mathbf{x}$ i $\phi$:
+
+        \begin{equation}
+        \label{eq:epsilon}
+            \epsilon \sim p(\epsilon)
+        \end{equation}
+        \begin{equation}
+        \label{eq:z_reparam}
+            \mathbf{z} = g(\phi, \mathbf{x}, \epsilon)
+        \end{equation}
+
+        On la funció $g(\cdot)$ és una transformació determinista.
+        El \gls{elbo} es pot reescriure
+        en funció de $\mathbb{E}_{p_(\epsilon)}$
+        en lloc de $\mathbb{E}_{q_\phi(\mathbf{z|x})}$,
+        és a dir, s'ha "externalitzat" la aleatorietat de la variable $\mathbf{z}$
+        a la nova variable $\epsilon$.
+        La nova forma del gradient del \gls{elbo} en respecte a $\phi$ és:
+
+        \begin{equation}
+        \label{eq:gradient_phi_reparam}
+            \nabla_\phi \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
+            \nabla_\phi \mathbb{E}_{p(\epsilon)} [
                 \log p_\theta(\mathbf{x,z}) -
                 \log q_\phi(\mathbf{z|x})
-                ]
-            \end{equation}
+            ]
+        \end{equation}
 
-            Per la regla de la integral de Leibniz, el gradient en la \cref{eq:gradient_theta} es pot moure a dins de la esperança i això permet la seva computació. Però el mateix no és possible en la \cref{eq:gradient_phi}, ja que l'esperança està en funció de $\phi$.
+        Després d'aquesta reparametrització,
+        es poden calcular els gradients del \gls{elbo}
+        respecte als paràmetres $\phi$ i $\theta$,
+        i així optimitzar-los mitjançant el descens de gradients.
 
-            Per resoldre aquest problema es planteja la següent solució:
-            reparametritzar la variable $\mathbf{z} \sim q_\theta(\mathbf{z|x})$
-            com una funció d'una altra variable aleatòria $\epsilon$, donades $\mathbf{x}$ i $\phi$:
+        \begin{figure}[htpb]
+            \centering
+            \includegraphics{kingma2019_reparam_trick.png}
+            \caption{
+                Il·lustració de la reparametrització de $\mathbf{z}$.
+                Per optimitzar els paràmetres $\theta$
+                es necessita calcular els gradients de la funció d'optimització $f$
+                amb respecte a $\theta$.
+                En la figura de l'esquerra (forma original)
+                no es pot diferenciar $f$ amb respecte a $\theta$
+                perquè no es poden propagar endarrere els gradients
+                a través de la variable aleatoria $\mathbf{z}$.
+                Després de la reparametrització (figura de la dreta),
+                la aleatorietat queda "externalitzada" a la variable $\epsilon$,
+                i $\mathbf{z}$ depèn d'una funció $g(\cdot)$ determinista.
+                Aquesta configuració sí permet propagar endarrere els gradients.
+                Font: Kingma and Welling, 2019 \citep{Kingma2019}
+            }
+            \label{fig:reparam_trick}
+        \end{figure}
 
-            \begin{equation}
-            \label{eq:epsilon}
-                \epsilon \sim p(\epsilon)
-            \end{equation}
-            \begin{equation}
-            \label{eq:z_reparam}
-                \mathbf{z} = g(\phi, \mathbf{x}, \epsilon)
-            \end{equation}
+    \subsection{Implementació del model}
+    \label{s:vae_implementacio}
 
-            On la funció $g(\cdot)$ és una transformació determinista.
-            El \gls{elbo} es pot reescriure
-            en funció de $\mathbb{E}_{p_(\epsilon)}$
-            en lloc de $\mathbb{E}_{q_\phi(\mathbf{z|x})}$,
-            és a dir, s'ha "externalitzat" la aleatorietat de la variable $\mathbf{z}$
-            a la nova variable $\epsilon$.
-            La nova forma del gradient del \gls{elbo} en respecte a $\phi$ és:
+        Un cop presentada la base teòrica,
+        a continuació es resumeix com s'ha implementat el model \gls{vae}
+        que s'ha construït en aquest \gls{tfm}.
+        S'ha escollit que la variable latent $\mathbf{z}$
+        segueixi una distribució barreja de gaussianes:
 
-            \begin{equation}
-            \label{eq:gradient_phi_reparam}
-                \nabla_\phi \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
-                \nabla_\phi \mathbb{E}_{p(\epsilon)} [
-                    \log p_\theta(\mathbf{x,z}) -
-                    \log q_\phi(\mathbf{z|x})
-                ]
-            \end{equation}
+        $$\mathbf{z} \sim \mathcal{N}(\mu, \sigma^2)$$
 
-            Després d'aquesta reparametrització,
-            es poden calcular els gradients del \gls{elbo}
-            respecte als paràmetres $\phi$ i $\theta$,
-            i així optimitzar-los mitjançant el descens de gradients.
+        On $\mu$ és el vector de mitjanes de les distribucions
+        i $\sigma^2$ és la matriu de variàncies.
+        Per simplificar els càlculs s'ha escollit una matriu diagonal,
+        de mode que $\sigma^2$ es pot escriure com un vector.
 
+        Així, el codificador i el descodificador del \gls{vae} són
+        dues xarxes neuronals amb paràmetres $\theta$ i $\phi$, respectivament.
+        Aquests paràmetres són l'arquitectura de la xarxa neuronal,
+        juntament amb els pesos pesos i biaixos de cada neurona.
 
-\todo{Incloure gràfic explicació respecte a la propagació endarrere (fig 2.3 de Kingma2019) }
+        El codificador pren com entrada els valors de les variables observades,
+        en forma d'un vector $\mathbf{x}$ per cada observació,
+        i té com a sortida dos vectors:
+        un vector $\mu$ amb les mitjanes de la barreja de gaussianes,
+        i un vector $\sigma^2$ amb les corresponents variàncies
+        (codificades com a $\log \sigma^2$ per motius de computació).
 
-        \subsection{Implementació del model}
-        \label{s:vae_implementacio}
+        El descodificador pren com entrada un punt de l'espai latent $\mathbf{z}$
+        i té com a sortida un vector amb la mateixa forma que $\mathbf{x}$.
 
-            Un cop presentada la base teòrica,
-            a continuació es resumeix com s'ha implementat el model \gls{vae}
-            que s'ha construït en aquest \gls{tfm}.
-            S'ha escollit que la variable latent $\mathbf{z}$
-            segueixi una distribució barreja de gaussianes:
+        En l'arquitectura \gls{ae},
+        durant la fase d'entrenament
+        es connecta la sortida del codificador a l'entrada del descodificador.
+        Així, les dues xarxes s'entrenen conjuntament
+        utilitzant el descens de gradient estocàstic.
+        En el caso de l'arquitectura \gls{vae},
+        és necessari aplicar la reparametrització
+        explicada en la \cref{s:vae_gradients}.
+        Un cop aplicada, es pot reescriure $\mathbf{z}$ com:
 
-            $$\mathbf{z} \sim \mathcal{N}(\mu, \sigma^2)$$
+        $$\epsilon \sim \mathcal{N}(0, \mathbf{I})$$
+        $$\mathbf{z} = \mu + \sigma \odot \epsilon$$
 
-            On $\mu$ és el vector de mitjanes de les distribucions
-            i $\sigma^2$ és la matriu de variàncies.
-            Per simplificar els càlculs s'ha escollit una matriu diagonal,
-            de mode que $\sigma^2$ es pot escriure com un vector.
+        On $\odot$ és el producte per elements.
 
-            Així, el codificador i el descodificador del \gls{vae} són
-            dues xarxes neuronals amb paràmetres $\theta$ i $\phi$, respectivament.
-            Aquests paràmetres són l'arquitectura de la xarxa neuronal,
-            juntament amb els pesos pesos i biaixos de cada neurona.
+        En la implementació del \gls{vae},
+        s'insereix una capa neuronal sense pesos o biaixos
+        enter el codificador i el descodificador.
+        Aquesta capa pren com entrada la sortida del codificador
+        (vectors $\mu$ i $\sigma^2$),
+        obté una mostra aleatòria de la distribució de $\epsilon$
+        i calcula un valor de $\mathbf{z}$,
+        que passa a l'entrada del descodificador.
 
-            El codificador pren com entrada els valors de les variables observades,
-            en forma d'un vector $\mathbf{x}$ per cada observació,
-            i té com a sortida dos vectors:
-            un vector $\mu$ amb les mitjanes de la barreja de gaussianes,
-            i un vector $\sigma^2$ amb les corresponents variàncies
-            (codificades com a $\log \sigma^2$ per motius de computació).
+        Per entrenar la xarxa neuronal en conjunt,
+        s'han definit dues funcions de cost
+        que corresponen als dos termes del \gls{elbo},
+        segons la \cref{eq:elbo} a la \cref{s:vae_optimitzacio}:
 
-            El descodificador pren com entrada un punt de l'espai latent $\mathbf{z}$
-            i té com a sortida un vector amb la mateixa forma que $\mathbf{x}$.
+        \begin{itemize}
+            \item \textbf{Funció de cost de la reconstrucció:}
+            computa la diferència entre l'entrada del codificador
+            i la sortida del descodificador
+            (la reconstrucció de l'entrada).
+            Minimitzant-la, es maximitza el terme
+            $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log p_\theta(\mathbf{x|z}) ]$
+            del \gls{elbo}.
 
-            En l'arquitectura \gls{ae},
-            durant la fase d'entrenament
-            es connecta la sortida del codificador a l'entrada del descodificador.
-            Així, les dues xarxes s'entrenen conjuntament
-            utilitzant el descens de gradient estocàstic.
-            En el caso de l'arquitectura \gls{vae},
-            és necessari aplicar la reparametrització
-            explicada en la \cref{s:vae_gradients}.
-            Un cop aplicada, es pot reescriure $\mathbf{z}$ com:
+            \item \textbf{Funció de cost de regularització:}
+            computa la distància \gls{kl}
+            entre la distribució de $\mathbf{z} \sim \mathcal{N}(\mu, \sigma^2)$
+            i una distribució $\mathcal{N}(0, \mathbf{I})$.
+            Minimitzant-la, es minimitza el terme
+            $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log ( q_\phi(\mathbf{z|x}) / p_\theta(\mathbf{z}) ) ]$
+            del \gls{elbo}.
+            S'anomena així ja que actua com a regularitzador
+            de la sortida del codificador,
+            assegurant que l'espai latent segueixi la distribució desitjada.
+        \end{itemize}
 
-            $$\epsilon \sim \mathcal{N}(0, \mathbf{I})$$
-            $$\mathbf{z} = \mu + \sigma \odot \epsilon$$
-
-            On $\odot$ és el producte per elements.
-
-            En la implementació del \gls{vae},
-            s'insereix una capa neuronal sense pesos o biaixos
-            enter el codificador i el descodificador.
-            Aquesta capa pren com entrada la sortida del codificador
-            (vectors $\mu$ i $\sigma^2$),
-            obté una mostra aleatòria de la distribució de $\epsilon$
-            i calcula un valor de $\mathbf{z}$,
-            que passa a l'entrada del descodificador.
-
-            Per entrenar la xarxa neuronal en conjunt,
-            s'han definit dues funcions de pèrdua
-            que corresponen als dos termes del \gls{elbo},
-            segons la \cref{eq:elbo} a la \cref{s:vae_optimitzacio}:
-
-            \begin{itemize}
-                \item \textbf{Funció de pèrdua de la reconstrucció:}
-                computa la diferència entre l'entrada del codificador
-                i la sortida del descodificador
-                (la reconstrucció de l'entrada).
-                Minimitzant-la, es maximitza el terme
-                $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log p_\theta(\mathbf{x|z}) ]$
-                del \gls{elbo}.
-
-                \item \textbf{Funció de pèrdua de regularització:}
-                computa la distància \gls{kl}
-                entre la distribució de $\mathbf{z} \sim \mathcal{N}(\mu, \sigma^2)$
-                i una distribució $\mathcal{N}(0, \mathbf{I})$.
-                Minimitzant-la, es minimitza el terme
-                $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log ( q_\phi(\mathbf{z|x}) / p_\theta(\mathbf{z}) ) ]$
-                del \gls{elbo}.
-                S'anomena així ja que actua com a regularitzador
-                de la sortida del codificador,
-                assegurant que l'espai latent segueixi la distribució desitjada.
-            \end{itemize}
-
-\todo{
-    Inserir gràfic que resumeixi les diferents parts del VAE:
-
-    x $\rightarrow$ codificador $\rightarrow$ mu, sigma $\rightarrow$ sampler $\rightarrow$ z $\rightarrow$ descodificador $\rightarrow$ x'
-}
+        \begin{figure}[htpb]
+            \centering
+            \includegraphics{karim2021_vae.png}
+            \caption{
+                !!
+                Esquema del model VAE.
+                Buscar figura on es representin les funcions de cost.
+                !!
+                Font: Karim \textit{et. al.}, 2021 \citep{Karim2021}
+            }
+            \label{fig:vae_karim}
+        \end{figure}
 
 
 
-    \subsection{Clustering loss?}
-    \label{s:??}
+    \subsection{Clustering}
+    \label{s:clustering}
+
+        Finalment, un cop s'ha entrenat el \gls{vae}
+        s'ha aconseguit un model amb un codificador
+        és capaç de representar les dades $\mathbf{x}$ en un espai latent $\mathbf{z}$,
+        i un descodificador capaç de generar mostres simulades
+        a partir de $\mathbf{z}$.
+        És a dir, el model ha après unes \gls{lf} rellevants de les dades
+        que permeten obtenir una \gls{rl} eficient.
+
+        El següent pas és aplicar una tècnica de \textit{clustering}
+        sobre les representacions de l'espai latent $\mathbf{z}$.
+        Per aconseguir-ho,
+        es construeix un model de \textit{clustering}
+        basat en una nova capa neuronal.
+        Els pesos de cada neurona d'aquesta capa
+        corresponen a la posició del centroide d'un clúster.
+        Una limitació d'aquesta tècnica és que requereix
+        establir el nombre $k$ de clústers prèviament.
+
+        La capa pren com entrada un punt de $\mathbf{z}$
+        i calcula la distància del punt a cada centroide.
+        La sortida de la capa és un vector de longitud $k$ que suma 1,
+        on cada valor representa la probabilitat d'assignació del punt a cada clúster.
+        Aquesta assignació s'interpreta com una distribució $Q$.
+
+        A continuació es defineix una nova funció de cost,
+        la \textbf{funció de cost de \textit{clustering}},
+        com la distància \gls{kl} entre la distribució $Q$
+        i una distribució auxiliar $P$.
+        Escollint una distribució auxiliar adequada,
+        al minimitzar aquesta distància
+        s'aconsegueix millorar la \gls{cq}:
+        es minimitza la distància de cada punt al seu centroide
+        alhora que es maximitza la distància a la resta de centroides.
+
+        La distribució auxiliar $P$ es calcula
+        a partir de $Q$:
+
+        \begin{equation}
+            \label{eq:clustering_aux}
+            p_{ij} =
+            \frac {q_{ij}^2 / f_j}
+                 {\sum_j' q_{ij}^2 / f_j'}
+        \end{equation}
+
+        On $p_{ij}$ i $q_{ij}$ són respectivament la probabilitat
+        de $P$ i $Q$ per la observació $i$ i el clúster $j$,
+        i $f_j$ és la freqüència del clúster $j$.
+
+        Un cop construït el nou model,
+        s'entrena conjuntament aplicant les tres funcions de cost
+        (funció de cost reconstrucció, de regularització i de \textit{clustering}),
+        ja que si s'optimitzés només respecte a la funció de cost de \textit{clustering}
+        es corre el risc que es perdin les \gls{lf} apreses.
+
+        Per establir uns pesos inicials,
+        abans d'iniciar l'entrenament
+        es passen les dades d'entrenament pel codificador
+        per obtenir les seves representacions en l'espai $\mathbf{z}$.
+        Seguidament s'aplica l'algoritme \textit{K-means}
+        i es pren la posició dels centroides.
+
+        Finalment, s'entrena la xarxa utilitzant el descens de gradients estocàstic.
+        El model aprendrà una nova representació en l'espai latent $\mathbf{z}$,
+        juntament amb una posició òptima dels centroides que defineixen cada clúster,
+        que en conjunt optimitzin la \gls{cq}
+        mantenint unes \gls{lf} rellevants a la \gls{rl}.
 
 
-    \subsection{Evauation metrics?}
-    \label{s:???}
+
+
+
+
+
+
+
+
+%    \subsection{Evauation metrics?}
+%    \label{s:???}
 
     \section{Software}
     \label{s:software}
