@@ -36,7 +36,7 @@
             \newacronym{cnn}{CNN}{\textit{convolutional neural network}}
             \newacronym{dbn}{DBN}{\textit{deep belief network}}
             \newacronym{gan}{GAN}{\textit{generative adversarial network}}
-            \newacronym{lstm}{lstm}{\textit{long short-term memory}}
+            \newacronym{lstm}{LSTM}{\textit{long short-term memory}}
             \newacronym{cae}{CAE}{\textit{convolutional autoencoder}}
             \newacronym{vae}{VAE}{\textit{variational autoencoder}}
             \newacronym{lstmae}{LSTM-AE}{\textit{long short-term memory autoencoder}}
@@ -327,7 +327,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         \textbf{\Gls{cae}:} l'arquitectura \gls{ae} estàndard no dona bons resultats per trobar patrons en imatges (dades amb invariança espacial). Per combatre-ho, es poden combinar amb \gls{cnn} utilitzant convolucions al codificador del \gls{ae} (i les corresponents desconvolucions al descodificador), on els filtres de la \gls{cnn} són un paràmetre que es pot optimitzar (en lloc de construir-los a mà com en una \gls{cnn} estàndard).
 
-        \textbf{\Gls{vae}:} aquesta aproximació es basa en mètodes Bayesians, el que li atorga certa robustesa estadística que no tenen altres arquitectures. Es tracten les dades com a mostres d'una distribució desconeguda i s'aplica una restricció al codificador perquè les representi com una barreja de distribucions conegudes (per exemple, gaussianes). Els paràmetres que aprèn la xarxa són els paràmetres de les distribucions (mitjana i variància). El descodificador reconstrueix les mostres originals, el que permet generar mostres aleatòries semblants a la distribució original desconeguda. S'explica amb més detall a la \cref{s:vae}.
+        \textbf{\Gls{vae}:} aquesta aproximació es basa en mètodes Bayesians, el que li atorga certa robustesa estadística que no tenen altres arquitectures. Es tracten les dades com a mostres d'una distribució desconeguda i s'aplica una restricció al codificador perquè les representi com una barreja de distribucions conegudes (per exemple, gaussianes). Els paràmetres que aprèn la xarxa són els paràmetres de les distribucions (mitjana i variància). El descodificador reconstrueix les mostres originals, el que permet generar mostres aleatòries semblants a la distribució original desconeguda. S'explica amb més detall a la \cref{s:metodes_vae}.
 
         \textbf{\Gls{lstmae}:} de manera similar al cas del \gls{cae}, l'arquitectura \gls{ae} estàndard no funciona bé amb dades seqüencials, però es pot combinar amb l'arquitectura \gls{lstm}. El codificador es forma combinant capes \gls{lstm}, on la última capa codifica un vector que representa l'entrada de la xarxa. El descodificador, també format per capes \gls{lstm}, pren aquest vector (replicat per adaptar-lo a l'entrada de la primera capa \gls{lstm}) i reconstrueix l'entrada original.
 
