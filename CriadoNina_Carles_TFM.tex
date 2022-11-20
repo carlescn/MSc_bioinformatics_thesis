@@ -5,7 +5,7 @@
 %Begin Carles customization{
 
     %Load packages
-        %Modifies ToC; include References, remove LoF, LoT
+        %Modifies ToC: include References, remove LoF, LoT
         \usepackage[nottoc, notlof, notlot, numbib]{tocbibind}
 
 %        %Insert page number in reference
@@ -19,7 +19,7 @@
             pdfauthor=Carles Criado Ninà,
         }
 
-        %Load the package with the acronym option
+        %Use acronyms
         \usepackage[acronym,nomain,section=section,numberedsection=autolabel]{glossaries}
             % Make glossary links black
             \renewcommand*{\glstextformat}[1]{\textcolor{black}{#1}}
@@ -65,8 +65,11 @@
             #1
             \end{tcolorbox}}
 
-        %Provides \mathbb{}
+        %Provides \mathbb{}, necessary for some maths symbols
         \usepackage{amsfonts}
+
+        %Use small font for image captions
+        \usepackage[font=footnotesize,labelfont=bf]{caption}
 
 %        %Insert sideways figure
 %        \usepackage{rotating}
@@ -349,13 +352,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     \section{Model de \textit{deep clustering}}
     \label{s:metodes_dc}
 
-\todo{
-    \begin{itemize}
-        \item Mencionar figures al text.
-        \item Figura 3.3: buscar figura on es representin les funcions de cost.
-    \end{itemize}
-}
-
     En aquest \gls{tfm}
     es pretén implementar un model de \textit{deep clustering} en dades metabòliques.
     Com s'ha descrit a les \cref{s:state_deep,s:state_ae},
@@ -417,10 +413,12 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         De la mateixa manera,
         l'objectiu del descodificador és aprendre els paràmetres $\theta$
         de la distribució $p_\theta(\mathbf{x|z})$.
+        A la \cref{fig:vae_kingma} s'il·lustra
+        com el model relaciona els espais $\mathbf{x}$ i $\mathbf{z}$.
 
-        \begin{figure}[htpb]
+        \begin{figure}
             \centering
-            \includegraphics{kingma2019_vae.png}
+            \includegraphics[width=0.5\textwidth]{kingma2019_vae.pdf}
             \caption{
                 Esquema del model \gls{vae}.
                 Les dades observades $\mathbf{D}$ (\textit{dataset})
@@ -589,10 +587,11 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         \end{equation}
 
         On la funció $g(\cdot)$ és una transformació determinista.
-        El \gls{elbo} es pot reescriure
+        Aquesta reparametrització s'il·lustra a la \cref{fig:reparametritzacio}.
+        Llavors, el \gls{elbo} es pot reescriure
         en funció de $\mathbb{E}_{p_(\epsilon)}$
         en lloc de $\mathbb{E}_{q_\phi(\mathbf{z|x})}$,
-        és a dir, s'ha "externalitzat" la aleatorietat de la variable $\mathbf{z}$
+        de manera que ``s'externalitza'' la aleatorietat de la variable $\mathbf{z}$
         a la nova variable $\epsilon$.
         La nova forma del gradient del \gls{elbo} en respecte a $\phi$ és:
 
@@ -610,9 +609,9 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         respecte als paràmetres $\phi$ i $\theta$,
         i així optimitzar-los mitjançant el descens de gradients.
 
-        \begin{figure}[htpb]
+        \begin{figure}
             \centering
-            \includegraphics{kingma2019_reparam_trick.png}
+            \includegraphics[width=0.7\textwidth]{kingma2019_reparam.pdf}
             \caption{
                 Il·lustració de la reparametrització de $\mathbf{z}$.
                 Per optimitzar els paràmetres $\theta$
@@ -623,12 +622,12 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                 perquè no es poden propagar endarrere els gradients
                 a través de la variable aleatoria $\mathbf{z}$.
                 Després de la reparametrització (figura de la dreta),
-                la aleatorietat queda "externalitzada" a la variable $\epsilon$,
+                la aleatorietat queda ``externalitzada'' a la variable $\epsilon$,
                 i $\mathbf{z}$ depèn d'una funció $g(\cdot)$ determinista.
                 Aquesta configuració sí permet propagar endarrere els gradients.
                 Font: Kingma and Welling, 2019 \citep{Kingma2019}
             }
-            \label{fig:reparam_trick}
+            \label{fig:reparametritzacio}
         \end{figure}
 
     \subsection{Implementació del model}
@@ -685,11 +684,14 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         obté una mostra aleatòria de la distribució de $\epsilon$
         i calcula un valor de $\mathbf{z}$,
         que passa a l'entrada del descodificador.
+        A la \cref{fig:vae_kingma} es mostren esquemàticament
+        les diferents parts del \gls{vae}.
 
         Per entrenar la xarxa neuronal en conjunt,
         s'han definit dues funcions de cost
+        (il·lustrades a la \cref{fig:vae_losses})
         que corresponen als dos termes del \gls{elbo},
-        segons la \cref{eq:elbo} a la \cref{s:vae_optimitzacio}:
+        segons la \cref{eq:elbo}.
 
         \begin{itemize}
             \item \textbf{Funció de cost de la reconstrucció:}
@@ -712,17 +714,21 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
             assegurant que l'espai latent segueixi la distribució desitjada.
         \end{itemize}
 
-        \begin{figure}[htpb]
+        \begin{figure}
             \centering
-            \includegraphics{karim2021_vae.png}
+            \includegraphics[width=\textwidth]{karim2021_vae.jpeg}
             \caption{
-                !!
-                Esquema del model VAE.
-                Buscar figura on es representin les funcions de cost.
-                !!
+                Representació esquemàtica d'una arquitectura \gls{vae}.
+                El codificador aprèn a representar l'entrada $\mathbf{x}$
+                en un espai latent $\mathbf{z}$
+                que segueix una distribució barreja de gaussianes,
+                amb un vector de mitjanes $\mu$ i un vector de variancies $\sigma$.
+                S'utilitza la reparametrització de $\mathbf{z}$ en funció de $\epsilon$.
+                El descodificador reconstrueix l'entrada
+                a partir de la representació a l'espai latent.
                 Font: Karim \textit{et. al.}, 2021 \citep{Karim2021}
             }
-            \label{fig:vae_karim}
+            \label{fig:vae_min}
         \end{figure}
 
 
@@ -797,17 +803,30 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         que en conjunt optimitzin la \gls{cq}
         mantenint unes \gls{lf} rellevants a la \gls{rl}.
 
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{min2018_losses.png}
+            \caption{
+                Esquema de les funcions de cost
+                aplicades durant l'entrenament
+                d'un model de \textit{deep clustering}
+                basat en arquitectura \gls{vae}.
+                Font: adaptada de Min \textit{et. al.}, 2018 \citep{Min2018}
+            }
+            \label{fig:vae_losses}
+        \end{figure}
 
 
+    \subsection{Evaluation metrics}
+    \label{s:metrics}
 
-
-
-
-
-
-
-%    \subsection{Evauation metrics?}
-%    \label{s:???}
+\todo{
+    \begin{itemize}
+        \item Llegir literatura
+        \item Escollir mètodes
+        \item Explicar mètodes seleccionats
+    \end{itemize}}
+\newpage
 
     \section{Software}
     \label{s:software}
