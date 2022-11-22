@@ -480,7 +480,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         Aquesta divergència es relaciona amb la distribució marginal
         segons la següent igualtat:
-
         \begin{equation}
             \label{eq:kl}
             \log p_\theta(\mathbf{x}) =
@@ -496,7 +495,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         ja que la divergència \gls{kl} és sempre no negativa i
         per tant \gls{elbo} és el límit inferior de $\log p_\theta(\mathbf{x})$
         (evidència de $\mathbf{x}$):
-
         \begin{equation}
             \label{eq:lim_inf}
             \log p_\theta(\mathbf{x}) \ge
@@ -504,7 +502,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         \end{equation}
 
         El terme \gls{elbo} es calcula segons la següent equació:
-
         \begin{equation}
         \label{eq:elbo}
             \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
@@ -542,7 +539,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         El \gls{elbo} es pot reformular de la següent manera,
         el que facilitarà el càlcul dels gradients:
-
         \begin{equation}
         \label{eq:elbo_2}
             \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
@@ -553,40 +549,35 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         \end{equation}
 
         I els gradients es calculen segons:
-
-        \begin{equation}
+        \begin{gather}
         \label{eq:gradient_theta}
             \nabla_\theta \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
             \nabla_\theta \mathbb{E}_{q_\phi(\mathbf{z|x})} [
             \log p_\theta(\mathbf{x,z}) -
             \log q_\phi(\mathbf{z|x})
             ]
-        \end{equation}
-        \begin{equation}
+        \\
         \label{eq:gradient_phi}
             \nabla_\phi \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
             \nabla_\phi \mathbb{E}_{q_\phi(\mathbf{z|x})} [
             \log p_\theta(\mathbf{x,z}) -
             \log q_\phi(\mathbf{z|x})
             ]
-        \end{equation}
+        \end{gather}
 
         Per la regla de la integral de Leibniz, el gradient en la \cref{eq:gradient_theta} es pot moure a dins de la esperança i això permet la seva computació. Però el mateix no és possible en la \cref{eq:gradient_phi}, ja que l'esperança està en funció de $\phi$.
 
         Per resoldre aquest problema es planteja la següent solució:
         reparametritzar la variable $\mathbf{z} \sim q_\theta(\mathbf{z|x})$
         com una funció d'una altra variable aleatòria $\epsilon$, donades $\mathbf{x}$ i $\phi$:
-
-        \begin{equation}
+        \begin{gather}
         \label{eq:epsilon}
-            \epsilon \sim p(\epsilon)
-        \end{equation}
-        \begin{equation}
+            \epsilon \sim p(\epsilon) \\
         \label{eq:z_reparam}
             \mathbf{z} = g(\phi, \mathbf{x}, \epsilon)
-        \end{equation}
+        \end{gather}
 
-        On la funció $g(\cdot)$ és una transformació determinista.
+        on la funció $g(\cdot)$ és una transformació determinista.
         Aquesta reparametrització s'il·lustra a la \cref{fig:reparametritzacio}.
         Llavors, el \gls{elbo} es pot reescriure
         en funció de $\mathbb{E}_{p_(\epsilon)}$
@@ -594,7 +585,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         de manera que ``s'externalitza'' la aleatorietat de la variable $\mathbf{z}$
         a la nova variable $\epsilon$.
         La nova forma del gradient del \gls{elbo} en respecte a $\phi$ és:
-
         \begin{equation}
         \label{eq:gradient_phi_reparam}
             \nabla_\phi \mathcal{L}_{\theta,\phi}(\mathbf{x}) =
@@ -641,7 +631,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         $$\mathbf{z} \sim \mathcal{N}(\mu, \sigma^2)$$
 
-        On $\mu$ és el vector de mitjanes de les distribucions
+        on $\mu$ és el vector de mitjanes de les distribucions
         i $\sigma^2$ és la matriu de variàncies.
         Per simplificar els càlculs s'ha escollit una matriu diagonal,
         de mode que $\sigma^2$ es pot escriure com un vector.
@@ -674,7 +664,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         $$\epsilon \sim \mathcal{N}(0, \mathbf{I})$$
         $$\mathbf{z} = \mu + \sigma \odot \epsilon$$
 
-        On $\odot$ és el producte per elements.
+        on $\odot$ és el producte per elements.
 
         En la implementació del \gls{vae},
         s'insereix una capa neuronal sense pesos o biaixos
@@ -691,24 +681,22 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         s'han definit dues funcions de cost
         (il·lustrades a la \cref{fig:vae_losses})
         que corresponen als dos termes del \gls{elbo},
-        segons la \cref{eq:elbo}.
+        segons la \cref{eq:elbo}:
 
         \begin{itemize}
             \item \textbf{Funció de cost de la reconstrucció:}
             computa la diferència entre l'entrada del codificador
             i la sortida del descodificador
             (la reconstrucció de l'entrada).
-            Minimitzant-la, es maximitza el terme
-            $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log p_\theta(\mathbf{x|z}) ]$
-            del \gls{elbo}.
+            Minimitzant-la, es maximitza el terme primer terme del \gls{elbo}:
+            $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log p_\theta(\mathbf{x|z}) ]$.
 
             \item \textbf{Funció de cost de regularització:}
             computa la distància \gls{kl}
             entre la distribució de $\mathbf{z} \sim \mathcal{N}(\mu, \sigma^2)$
             i una distribució $\mathcal{N}(0, \mathbf{I})$.
-            Minimitzant-la, es minimitza el terme
-            $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log ( q_\phi(\mathbf{z|x}) / p_\theta(\mathbf{z}) ) ]$
-            del \gls{elbo}.
+            Minimitzant-la, es minimitza el segon terme del \gls{elbo}:
+            $\mathbb{E}_{q_\phi(\mathbf{z|x})} [ \log ( q_\phi(\mathbf{z|x}) / p_\theta(\mathbf{z}) ) ]$.
             S'anomena així ja que actua com a regularitzador
             de la sortida del codificador,
             assegurant que l'espai latent segueixi la distribució desitjada.
@@ -772,7 +760,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         La distribució auxiliar $P$ es calcula
         a partir de $Q$:
-
         \begin{equation}
             \label{eq:clustering_aux}
             p_{ij} =
@@ -780,7 +767,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                  {\sum_j' q_{ij}^2 / f_j'}
         \end{equation}
 
-        On $p_{ij}$ i $q_{ij}$ són respectivament la probabilitat
+        on $p_{ij}$ i $q_{ij}$ són respectivament la probabilitat
         de $P$ i $Q$ per la observació $i$ i el clúster $j$,
         i $f_j$ és la freqüència del clúster $j$.
 
@@ -817,16 +804,208 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         \end{figure}
 
 
-    \subsection{Evaluation metrics}
+    \subsection{Mètriques d'avaluació}
     \label{s:metrics}
 
-\todo{
-    \begin{itemize}
-        \item Llegir literatura
-        \item Escollir mètodes
-        \item Explicar mètodes seleccionats
-    \end{itemize}}
-\newpage
+        Per validar la \gls{cq}
+        s'han utilitzat dos tipus de mètriques:
+        validació externa i validació interna.
+        Les mètriques de validació externa
+        es basen en comparar els clústers obtinguts
+        amb una partició de les dades coneguda prèviament,
+        que es considera la partició "correcta".
+        Les mètriques de validació interna
+        no utilitzen dades externes i
+        es basen en mesures observables
+        en la pròpia estructura dels clústers.
+
+        Donat que la tècnica de \textit{clustering}
+        és una tècnica d'aprenentatge no supervisada,
+        normalment s'utilitzen exclusivament les mètriques de validació interna
+        ja que no es coneix l'estructura real de les dades.
+        En el cas d'aquest \gls{tfm},
+        les dades utilitzades provenen d'un estudi clínic
+        i estan etiquetades segons el diagnòstic de cada pacient,
+        per tant s'han pogut utilitzar també mètriques de validació externa.
+
+        Cap mètrica per si sola és eficaç
+        per avaluar la \gls{cq} \cite{Palacio-Nino2019},
+        de manera que s'han seleccionat quatre mètriques:
+        una basada en validació interna
+        i tres basades en validació externa.
+        Es descriuen a continuació:
+
+        \paragraph{Mètriques de validació interna}
+            La \gls{cq} es pot mesurar en funció de
+            la cohesió
+            (la proximitat entre els elements dins d'un mateix clúster),
+            i el nivell de separació entre els diferents clústers.
+
+%            \newacronym{sse}{SSE}{suma de quadrats dels errors dintre de clústers
+%                                  (\textit{sum of squared errors within clusters})}
+%            \newacronym{ssb}{SSB}{suma de quadrats dels errors entre clústers
+%                                  (\textit{sum of squared errors between clusters})}
+%            \newacronym{ch}{CH}{coefficient de Calisnki-Harabasz}
+%
+%            La cohesió es pot mesurar
+%            mitjançant la \gls{sse}:
+%            \begin{equation}
+%            \label{eq:sse}
+%                SSE(C_i) = \sum_{x \in C_i} d(c_i, x)^2
+%            \end{equation}
+%            on $x$ és un punt dintre del clúster $C_i$
+%            i $c_i$ és el centroide del clúster.
+%
+%            De manera similar,
+%            el nivell de separació és pot mesurar
+%            mitjançant la \gls{ssb}:
+%            \begin{equation}
+%            \label{eq:ssn}
+%                SSB = \sum_{i=1}^{K} m_i d(c_i, c)^2
+%            \end{equation}
+%            on $m_i$ és el nombre d'observacions
+%            en el clúster $i$,
+%            $c_i$ el seu centroide
+%            i $c$ la mitjana global.
+%
+%            Les dues mesures es poden combinar en una sola mètrica
+%            utilitzant el \gls{ch}:
+%            \begin{equation}
+%            \label{eq:ch}
+%                CH = \frac
+%                { \frac{SSB_M}{M-1} }
+%                { \frac{SSE_M}{M} }
+%            \end{equation}
+%            on $M$ és el nombre de clústers.
+
+
+            Una de les mètriques més comuns
+            per avaluar aquestes dues característiques
+            és el coeficient silueta.
+            Es computa de la següent manera,
+            segons les equacions a continuació:
+            per cada punt $i$ es computen
+            la distància mitja $a(i)$ a tots els punts $j$ dins el mateix cluster $C_a$,
+            la mínima distància mitja $b(i)$ a tots els punts $j$ dins cada cluster $C_b$ diferent de $C_a$
+            i el seu coeficient silueta $s(i)$.
+            Finalment, es computa la silueta global $S$
+            prenent la mitjana de les siluetes de tots els punts.
+
+            \begin{gather}
+                a(i) = \frac{1}{|C_a|}
+                \sum_{j \in C_a, i \neq j} d(i,j)
+                \\
+                b(i) = \min_{C_b \neq C_a}
+                \frac{1}{|C_b|}
+                \sum_{j \in C_b} d(i,j)
+                \\
+                s(i) = \frac
+                {b(i) - a(i)}
+                {\max \{a(i), b(i)\}}
+                \\
+                \label{eq:sil}
+                S = \frac{1}{n}
+                \sum_{i=1}^{n} s(i)
+            \end{gather}
+
+            El coeficients silueta pren un valor en l'interval $[-1, 1]$,
+            on valors positius indiquen una bona separació entre clústers,
+            valors negatius indiquen que els clústers estan barrejats entre ells,
+            i un coeficient de zero indica que les dades estan distribuïdes uniformement.
+
+        \paragraph{Mètriques de validació externa}
+            Si es té una partició de referència $P$,
+            la \gls{cq} es pot mesurar comparant-la
+            amb els clústers $C$ resultants de l'algoritme de \textit{clustering}.
+            Es construeix un taula de contingència
+            i es comparen les parelles d'observacions
+            trobades en el mateix o diferents clústers
+            en les particions $P$ i $C$.
+            S'extreuen els següents indicadors:
+            \begin{description}
+                \item[TP]
+                nombre de parelles trobades al mateix clúster
+                tant en $C$ com en $P$.
+
+                \item[FP] nombre de parelles trobades al mateix clúster en $C$,
+                però en diferents clústers en $P$.
+
+                \item[TN] nombre de parelles trobades en diferents clústers
+                tant en $C$ com en $P$.
+
+                \item[FP] nombre de parelles trobades en diferents clústers en $C$,
+                però en el mateix clúster en $P$.
+            \end{description}
+
+            Amb aquests indicadors
+            es pot computar una gran varietat de mètriques,
+            que es poden classificar diverses famílies \citep{Palacio-Nino2019}.
+            \begin{itemize}
+                \item La família de conjunts coincidents
+                es basa en assignar una correspondència
+                entre els clusters $C$ i les particions $P$,
+                i mesurar la similaritat entre els conjunts.
+
+                \item La família d'igual a igual parteix de l'assumpció
+                que les observacions que es troben a la mateixa partició a $P$
+                haurien d'esta també al mateix clúster $C$,
+                i es basen en les correlacions entre parelles d'observacions.
+
+                \item La tercera família es basa
+                en conceptes de la teoria de la informació.
+            \end{itemize}
+
+
+            S'ha seleccionat una mètrica de cada família, respectivament:
+            el valor-F,
+            l'índex de Rand
+            i el coeficient de informació mútua.
+
+            \subparagraph{Valor-F}
+                La precisió ($Pr$) mesura
+                el nombre d'elements dins de cada clúster classificats correctament.
+                La exhaustivitat ($R$ de \textit{recall} mesura
+                el nombre d'elements dins de cada partició real classificats correctament.
+                Aquests dos coeficients es poden combinar
+                en una sola mètrica, l'anomenat valor-F:
+                \begin{gather}
+                \label{eq:precision}
+                    Pr = \frac{TP}{TP + FP}
+                \\
+                \label{eq:recall}
+                    R = \frac{TP}{TP + FN}
+                \\
+                \label{eq:f_measure}
+                    F = \frac{2 Pr R}{Pr + R}
+                \end{gather}
+
+            \subparagraph{Índex de Rand}
+                És l'equivalent a l'exactitud (\textit{accuracy})
+                en un mètode d'aprenentatge supervisat.
+                Calcula la similaritat entre les particions $C$ i $P$
+                com la proporció d'el nombre d'elements classificats correctament
+                respecte el nombre total d'elements:
+                \begin{equation}
+                \label{eq:rand}
+                    RI = \frac{TP + TN}{TP + FP + TN + FN}
+                \end{equation}
+
+            \subparagraph{Coeficient de informació mútua}
+                Mesura la reducció en la incertesa
+                de l'assignació dels clústers $C$
+                donada la partició coneguda $P$.
+                \begin{equation}
+                \label{eq:mi}
+                    MI = \sum_i \sum_j p_{ij} \log \frac{p_{ij}}{p_i p_j}
+                \end{equation}
+
+                on $p_{ij}$ és la proporció d'observacions
+                de la partició $i$ trobades al clúster $j$
+                respecte el total d'observacions;
+                $p_i$ i $p_j$ són les proporcions d'observacions
+                trobades respectivament a la partició $i$
+                i al clúster $j$.
+
 
     \section{Software}
     \label{s:software}
