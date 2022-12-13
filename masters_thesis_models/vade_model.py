@@ -17,6 +17,7 @@ def get_autoencoder_models(input_dim, latent_dim):
     encoder_mu = layers.Dense(latent_dim) (x)
     encoder_logvar = layers.Dense(latent_dim) (x)
     encoder = models.Model(encoder_inputs, [encoder_mu, encoder_logvar], name="encoder")
+    
     # Decoder
     decoder_inputs = keras.Input(shape=(latent_dim), name="decoder_inputs")
     x = layers.Dense(2048, activation="relu") (decoder_inputs)
@@ -24,6 +25,7 @@ def get_autoencoder_models(input_dim, latent_dim):
     x = layers.Dense(512, activation="relu") (x)
     decoder_outputs = layers.Dense(input_dim, activation="sigmoid") (x)
     decoder = models.Model(decoder_inputs, decoder_outputs, name="decoder")
+    
     return (encoder, decoder)
 
 
@@ -71,6 +73,10 @@ class VaDE(models.Model):
     def weights(self):
         return K.softmax(self._pi, axis=0)
 
+    def encode_only_mu(self, x):
+        mu, _ = self.encoder(x)
+        return mu
+    
     def encode(self, x):
         return self.encoder(x)
 
@@ -155,5 +161,3 @@ class AutoEncoderForPretrain(models.Model):
         z = self.encode(x)
         recon_x = self.decode(z)
         return recon_x
-    
-
