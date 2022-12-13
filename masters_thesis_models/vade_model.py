@@ -139,13 +139,8 @@ class VaDE(models.Model):
     
 
 class AutoEncoderForPretrain(models.Model):
-    """Auto-Encoder for pretraining VaDE.
-
-    Args:
-        data_dim (int): Dimension of observed data.
-        latent_dim (int): Dimension of latent space.
-    """
-    def __init__(self, data_dim, latent_dim, encoder, decoder, **kwargs):
+    """Auto-Encoder for pretraining VaDE."""
+    def __init__(self, encoder, decoder, **kwargs):
         super(AutoEncoderForPretrain, self).__init__(**kwargs)
         self.encoder = encoder
         self.decoder = decoder
