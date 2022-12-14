@@ -8,27 +8,6 @@ import math
 import numpy as np
 
 
-def get_autoencoder_models(input_dim, latent_dim):
-    # Encoder
-    encoder_inputs = keras.Input(shape=(input_dim), name="encoder_inputs")
-    x = layers.Dense(512, activation="relu") (encoder_inputs)
-    x = layers.Dense(512, activation="relu") (x)
-    x = layers.Dense(2048, activation="relu") (x)
-    encoder_mu = layers.Dense(latent_dim) (x)
-    encoder_logvar = layers.Dense(latent_dim) (x)
-    encoder = models.Model(encoder_inputs, [encoder_mu, encoder_logvar], name="encoder")
-    
-    # Decoder
-    decoder_inputs = keras.Input(shape=(latent_dim), name="decoder_inputs")
-    x = layers.Dense(2048, activation="relu") (decoder_inputs)
-    x = layers.Dense(512, activation="relu") (x)
-    x = layers.Dense(512, activation="relu") (x)
-    decoder_outputs = layers.Dense(input_dim, activation="sigmoid") (x)
-    decoder = models.Model(decoder_inputs, decoder_outputs, name="decoder")
-    
-    return (encoder, decoder)
-
-
 def _reparameterize(mu, logvar):
     """Reparameterization trick.
     """
