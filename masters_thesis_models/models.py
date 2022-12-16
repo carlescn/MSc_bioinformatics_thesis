@@ -25,6 +25,10 @@ def get_decoder(output_dim, latent_dim, intermediate_dims=[]):
     decoder_outputs = layers.Dense(output_dim, activation="sigmoid", name="recon_x") (x)
     return models.Model(decoder_inputs, decoder_outputs, name="Decoder")
 
+def get_autoencoder_model(input_dim, latent_dim, intermediate_dims=[]):
+    encoder = get_encoder(input_dim, latent_dim, intermediate_dims)
+    decoder = get_decoder(input_dim, latent_dim, intermediate_dims)    
+    return AutoEncoder(encoder, decoder)
 
 class AutoEncoder(models.Model):
     def __init__(self, encoder, decoder, **kwargs):
@@ -43,6 +47,91 @@ class AutoEncoder(models.Model):
         recon_x = self.decode(z)
         return recon_x
 
+    
+##### DEC #####
+
+def _compute_soft_assignment(z, centroids):
+    """ student t-distribution, as same as used in t-SNE algorithm.
+     Measure the similarity between embedded point z_i and centroid µ_j.
+             q_ij = 1/(1+dist(x_i, µ_j)^2), then normalize it.
+             q_ij can be interpreted as the probability of assigning sample i to cluster j.
+             (i.e., a soft assignment)
+    Arguments:
+        z: embedded points, shape=(n_samples, n_features)
+        centroids: centroids, shape=(n_clusters, n_features)
+    Return:
+        q: student's t-distribution, or soft labels for each sample. shape=(n_samples, n_clusters)
+    Source: https://github.com/rezacsedu/Deep-Learning-for-Clustering-in-Bioinformatics/blob/master/Notebooks/DEC_Gene_Clustering.ipynb
+    """
+    alpha = 1.0
+    q = 1.0 / (1.0 + (K.sum(K.square(K.expand_dims(z, axis=1) - centroids), axis=2) / alpha))
+    q **= (alpha + 1.0) / 2.0
+    q = K.transpose(K.transpose(q) / K.sum(q, axis=1)) # Make sure each sample's 10 values add up to 1.
+    return q
+
+def clustering_loss_function(q, p):
+    return tf.reduce_sum(tf.keras.losses.kld(q, p))
+
+def get_dec_model(encoder, n_clusters):
+    return DEC(encoder, n_clusters)
+
+def compute_p(q):
+    """
+    Compute the auxiliary distirbution P.
+    Source: https://github.com/rezacsedu/Deep-Learning-for-Clustering-in-Bioinformatics/blob/master/Notebooks/DEC_Gene_Clustering.ipynb
+    """
+    weight = q ** 2 / tf.reduce_sum(q, axis=0)
+    p = tf.transpose(tf.transpose(weight) / tf.reduce_sum(weight, axis=1))
+    return p.numpy()
+
+
+def compute_delta(c_new, c_last):
+    """
+    Compute the proportion of points that changed clusters.
+    """
+    delta = np.sum(c_new != c_last).astype(np.float32) / c_new.shape[0]
+    return delta
+
+
+class DEC(models.Model):
+    def __init__(self, encoder, n_clusters, **kwargs):
+        super(DEC, self).__init__(**kwargs)
+        self.encoder = encoder
+        
+        latent_dim = encoder.outputs[0].shape[1]
+        self.centroids = self.add_weight(name='centroids', shape=(n_clusters, latent_dim), trainable=True, initializer=tf.keras.initializers.random_normal)
+        
+        self.loss_tracker = keras.metrics.Mean(name="loss")
+
+    @property
+    def metrics(self):
+        return [self.loss_tracker,]
+    
+    def encode(self, x):
+        return self.encoder(x)
+    
+    def soft_assignment(self, x):
+        z = self.encode(x)
+        return _compute_soft_assignment(z, self.centroids)
+
+    def classify(self, x):
+        q = self.soft_assignment(x)
+        return q.numpy().argmax(1)
+    
+    def call(self, x):
+        return self.classify(x)
+
+    def train_step(self, data):
+        x, p = data
+        with tf.GradientTape() as tape:
+            q = self.soft_assignment(x)
+            loss = clustering_loss_function(q, p)
+            gradients = tape.gradient(loss, self.trainable_weights)
+            self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
+            self.loss_tracker.update_state(loss)
+        return {"loss": self.loss_tracker.result()}
+
+
 
 ##### VAE #####
 
@@ -52,24 +141,21 @@ def _reparameterize(mu, logvar):
     eps = tf.random.normal(shape=tf.shape(mu))
     return mu + eps * std
 
-def get_vae_encoder_decoder_models(input_dim, latent_dim, intermediate_dims):
+def get_vae_encoder(input_dim, latent_dim, intermediate_dims):
     assert len(intermediate_dims) >= 1
-    ae_encoder = get_encoder(input_dim, intermediate_dims[-1], intermediate_dims[:-1])
-    
-    h = ae_encoder(ae_encoder.inputs)
+    encoder = get_encoder(input_dim, intermediate_dims[-1], intermediate_dims[:-1])
+    h = encoder(encoder.inputs)
     z_mu = layers.Dense(latent_dim, name="z_mu") (h)
     z_logvar = layers.Dense(latent_dim, name="z_logvar") (h)
-    
-    vae_encoder = models.Model(ae_encoder.inputs, [z_mu, z_logvar], name="Encoder")
-    vae_decoder = get_decoder(input_dim, latent_dim, intermediate_dims)
-    return vae_encoder, vae_decoder
+    return models.Model(encoder.inputs, [z_mu, z_logvar], name="Encoder")
 
 def get_vae_model(input_dim, latent_dim, intermediate_dims):
-    vae_encoder, vae_decoder = get_vae_encoder_decoder_models(input_dim, latent_dim, intermediate_dims)
+    vae_encoder = get_vae_encoder(input_dim, latent_dim, intermediate_dims)
+    vae_decoder = get_decoder(input_dim, latent_dim, intermediate_dims)
     return VAE(vae_encoder, vae_decoder)
 
 def get_clustering_vae_model(vae_model, n_clusters, clustering_loss_weight=1):
-    return ClusteringVAE(n_clusters, vae_model.encoder, vae_model.decoder, clustering_loss_weight)
+    return ClusteringVAE(vae_model.encoder, vae_model.decoder, n_clusters, clustering_loss_weight)
 
 
 class VAE(models.Model):
@@ -132,11 +218,11 @@ class VAE(models.Model):
 
 
 class ClusteringVAE(VAE):
-    def __init__(self, n_clusters, encoder, decoder, clustering_loss_weight=1, **kwargs):
+    def __init__(self, encoder, decoder, n_clusters, clustering_loss_weight=1, **kwargs):
         super(ClusteringVAE, self).__init__(encoder, decoder, **kwargs)
         latent_dim = encoder.outputs[0].shape[1]
-        self.clustering_loss_weight=clustering_loss_weight
         self.centroids = self.add_weight(name='centroids', shape=(n_clusters, latent_dim), trainable=True, initializer=tf.keras.initializers.random_normal)
+        self.clustering_loss_weight=clustering_loss_weight
         self.clustering_loss_tracker = keras.metrics.Mean(name="clust_loss")
 
     @property
@@ -145,27 +231,15 @@ class ClusteringVAE(VAE):
                self.regularization_loss_tracker,
                self.reconstruction_loss_tracker,
                self.clustering_loss_tracker]
-
-    def _compute_soft_assignment(self, z):
-        """
-        Compute cluster assignments.
-        Source: https://github.com/Tony607/Keras_Deep_Clustering/blob/master/Keras-DEC.ipynb
-        """
-        q = 1.0 / (1.0 + K.sum(K.square(K.expand_dims(z, axis=1) - self.centroids), axis=2))
-        q = K.transpose(K.transpose(q) / K.sum(q, axis=1)) # Make sure each sample's 10 values add up to 1.
-        return q
     
     def soft_assignment(self, x):
         z_mu, z_logvar = self.encode(x)
         z = _reparameterize(z_mu, z_logvar)
-        return self._compute_soft_assignment(z)
+        return _compute_soft_assignment(z, self.centroids)
 
     def classify(self, x):
         q = self.soft_assignment(x)
         return q.numpy().argmax(1)
-    
-    def clustering_loss(self, q, p):
-        return tf.reduce_sum(tf.keras.losses.kld(q, p))
 
     def train_step(self, data):
         x, p = data
@@ -174,11 +248,11 @@ class ClusteringVAE(VAE):
             z_mu, z_logvar = self.encode(x)
             z = _reparameterize(z_mu, z_logvar)
             recon_x = self.decode(z)
-            q = self._compute_soft_assignment(z)
+            q = _compute_soft_assignment(z, self.centroids)
             
             regularizatoin_loss = self.regularization_loss(z_mu, z_logvar)
             reconstruction_loss = self.reconstruction_loss(x, recon_x)
-            clustering_loss = self.clustering_loss(q, p)
+            clustering_loss = clustering_loss_function(q, p)
             total_loss = regularizatoin_loss + reconstruction_loss + self.clustering_loss_weight*clustering_loss
             
             gradients = tape.gradient(total_loss, self.trainable_weights)
@@ -193,6 +267,7 @@ class ClusteringVAE(VAE):
                 "reg_loss": self.regularization_loss_tracker.result(),
                 "rec_loss": self.reconstruction_loss_tracker.result(),
                 "clust_loss": self.clustering_loss_tracker.result()}
+
 
 
 ##### VaDE #####
