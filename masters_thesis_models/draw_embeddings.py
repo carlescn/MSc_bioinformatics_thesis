@@ -147,8 +147,9 @@ def compare_reconstructed_images_MNIST(dataset, encoder, decoder, labels, old_fi
     *(where: N >= n: number of images in the dataset.
              C >= 2: number of columns, one per compared model.)
     """
+    assert len(encoder.outputs) <= 2
     
-    index = np.arange(0,n)
+    dataset = dataset[0:n]
     res = 28
        
     if old_figure is not None:
@@ -157,22 +158,21 @@ def compare_reconstructed_images_MNIST(dataset, encoder, decoder, labels, old_fi
         figure[0:old_figure.shape[0], 0:old_figure.shape[1]] = old_figure
     else:
         figure = np.zeros((n*res, 2*res))
-        for i in index:
-            figure[i*res:(i+1)*res, 0:res] = dataset[i].reshape(res, res)
+        figure[0:n*res, 0:res] = dataset.reshape(n*res, res)
     
-    for i in index:
-        z, _ = encoder.predict(dataset[[i]], verbose=0)
-        reconstructed = decoder.predict(z, verbose=0).reshape(res, res)
-        figure[i*res:(i+1)*res, figure.shape[1]-res:figure.shape[1]] = reconstructed
-
+    if len(encoder.outputs) == 1:
+        z = encoder.predict(dataset, verbose=0)
+    else:
+        z, _ = encoder.predict(dataset, verbose=0)
+        
+    reconstructed = decoder.predict(z, verbose=0).reshape(n*res, res)
+    figure[0:n*res, figure.shape[1]-res:figure.shape[1]] = reconstructed[0:n*res, 0:res]
+    
     plt.figure()
-    # plt.axis("off")
-    
     x_ticks = np.arange(res/2, figure.shape[1], res)
     assert len(labels) == len(x_ticks)
     plt.xticks(x_ticks, labels, rotation=90)
     plt.yticks([])
-    
     plt.imshow(figure, cmap="Greys_r")
     
     return figure
