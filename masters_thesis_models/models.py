@@ -277,7 +277,8 @@ class ClusteringVAE(VAE):
 ##### VaDE #####
 
 def get_vade_models(n_classes, input_dim, latent_dim, intermediate_dims):
-    vae_encoder, vae_decoder = get_vae_encoder_decoder_models(input_dim, latent_dim, intermediate_dims)
+    vae_encoder = get_vae_encoder(input_dim, latent_dim, intermediate_dims)
+    vae_decoder = get_decoder(input_dim, latent_dim, intermediate_dims)
     autoencoder_model = AutoEncoderForPretrain(vae_encoder, vae_decoder)
     vade_model = VaDE(n_classes, vae_encoder, vae_decoder)
     return autoencoder_model, vade_model
