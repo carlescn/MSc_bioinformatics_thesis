@@ -69,8 +69,8 @@ def _compute_soft_assignment(z, centroids):
     q = K.transpose(K.transpose(q) / K.sum(q, axis=1)) # Make sure each sample's 10 values add up to 1.
     return q
 
-def clustering_loss_function(q, p):
-    return tf.reduce_sum(tf.keras.losses.kld(q, p))
+def clustering_loss_function(true_dist, pred_dist):
+    return K.mean(tf.keras.losses.kld(true_dist, pred_dist))
 
 def get_dec_model(encoder, n_clusters):
     return DEC(encoder, n_clusters)
@@ -79,6 +79,9 @@ def compute_p(q):
     """
     Compute the auxiliary distirbution P.
     Source: https://github.com/rezacsedu/Deep-Learning-for-Clustering-in-Bioinformatics/blob/master/Notebooks/DEC_Gene_Clustering.ipynb
+        def target_distribution(q):
+            weight = q ** 2 / q.sum(0)
+            return (weight.T / weight.sum(1)).T
     """
     weight = q ** 2 / tf.reduce_sum(q, axis=0)
     p = tf.transpose(tf.transpose(weight) / tf.reduce_sum(weight, axis=1))
@@ -125,7 +128,8 @@ class DEC(models.Model):
         x, p = data
         with tf.GradientTape() as tape:
             q = self.soft_assignment(x)
-            loss = clustering_loss_function(q, p)
+            loss = clustering_loss_function(q, p)   # Reverse KL (zero forcing) achieves tighter clusters
+            # loss = clustering_loss_function(p, q) # Forward KL (zero avoiding)
             gradients = tape.gradient(loss, self.trainable_weights)
             self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
             self.loss_tracker.update_state(loss)
