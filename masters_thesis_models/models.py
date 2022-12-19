@@ -195,11 +195,11 @@ class VAE(models.Model):
         return recon_x, z_mu, z_logvar
     
     def regularization_loss(self, z_mu, z_logvar):
-        reg_loss = -0.5 * tf.reduce_sum(1 + z_logvar - tf.square(z_mu) - tf.exp(z_logvar), axis=-1)
-        return tf.reduce_mean(reg_loss)
+        reg_loss = -0.5 * K.sum(1 + z_logvar - K.square(z_mu) - K.exp(z_logvar), axis=-1)
+        return K.mean(reg_loss)
     
     def reconstruction_loss(self, x, recon_x):
-        return tf.reduce_sum(keras.losses.binary_crossentropy(x, recon_x))
+        return K.sum(keras.losses.binary_crossentropy(x, recon_x))
 
     def train_step(self, x):
         with tf.GradientTape() as tape:
@@ -256,7 +256,8 @@ class ClusteringVAE(VAE):
             
             regularizatoin_loss = self.regularization_loss(z_mu, z_logvar)
             reconstruction_loss = self.reconstruction_loss(x, recon_x)
-            clustering_loss = clustering_loss_function(q, p)
+            clustering_loss = clustering_loss_function(q, p)   # Reverse KL (zero forcing) achieves tighter clusters
+            # clustering_loss = clustering_loss_function(p, q) # Forward KL (zero avoiding)
             total_loss = regularizatoin_loss + reconstruction_loss + self.clustering_loss_weight*clustering_loss
             
             gradients = tape.gradient(total_loss, self.trainable_weights)
