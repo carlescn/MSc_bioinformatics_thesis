@@ -1,6 +1,3 @@
-# import numpy as np
-# import matplotlib.pyplot as plt
-
 import seaborn as sns
 import sklearn.metrics
 
@@ -23,19 +20,26 @@ def evaluate_clustering_performance(clustering_method, data, true_labels, silhou
     encode_method : method, optional(default=None)
         Model method (or function) which returns the embeddings on the latent space.
         Necessary for computing the Silhouette.
+        
+    Returns:
+    --------
+    performance : dictionary
+        A dictionary containing some performance metrics.
     """
-    
     cluster_assignments = clustering_method(data)
     confusion_matrix = sklearn.metrics.confusion_matrix(true_labels, cluster_assignments)
     cluster_matched_labels = confusion_matrix.argmax(0)[cluster_assignments]
     
     heatmap = sns.heatmap(confusion_matrix,  cmap='magma')
     heatmap.set(xlabel='clusters', ylabel='true labels')
-
-    print(f"Acc: {sklearn.metrics.accuracy_score(true_labels, cluster_matched_labels):.4f}")
-    print(f"ARI: {sklearn.metrics.adjusted_rand_score(true_labels, cluster_assignments):.4f}")
-    print(f"AMI: {sklearn.metrics.adjusted_mutual_info_score(true_labels, cluster_assignments):.4f}")
+    
+    performance = {"Acc" : sklearn.metrics.accuracy_score(true_labels, cluster_matched_labels),
+                   "ARI" : sklearn.metrics.adjusted_rand_score(true_labels, cluster_matched_labels),
+                   "AMI" : sklearn.metrics.adjusted_mutual_info_score(true_labels, cluster_matched_labels),
+                  }
 
     if silhouette and encode_method is not None:
         z = encode_method(data)
-        print(f"Sil: {sklearn.metrics.silhouette_score(z, cluster_assignments):.4f}")
+        performance['Sil'] = sklearn.metrics.silhouette_score(z, cluster_assignments)
+    
+    return performance
