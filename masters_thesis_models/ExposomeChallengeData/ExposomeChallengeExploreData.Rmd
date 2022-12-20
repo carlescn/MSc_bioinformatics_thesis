@@ -1,0 +1,146 @@
+---
+title: "Prepare data from the of the Exposome Challenge data set"
+author: "Carles Criado Ninà"
+output:
+  html_document: 
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    number_sections: true
+    theme: cerulean
+---
+
+<style>
+  <!-- To have nice indentation in toc_float. Copied from:
+  https://github.com/rstudio/rmarkdown/issues/1909 -->
+  .tocify-header {
+    text-indent: initial;
+  }
+  .tocify-subheader > .tocify-item {
+    text-indent: initial;
+    padding-left: 2em;
+  }
+</style>
+
+***
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r libaries, echo=FALSE}
+library(Biobase)
+```
+
+
+# Load the data
+
+First, we load the data sets and explore their structure.
+The data is obtained from the 
+[Exposome Data Challenge Event 2021](https://www.isglobal.org/-/exposome-data-analysis-challenge)
+and is available at [github](https://github.com/isglobal-exposomeHub/ExposomeDataChallenge2021).
+```{r load_data}
+load("ExposomeChallengeStartingPoint.RData")
+```
+
+## Codebook (DataFrame)
+```{r codebook}
+str(codebook) |> str()
+```
+
+## Phenotype (DataFrame)
+```{r phenotype}
+phenotype |> str()
+```
+
+## Covariates (DataFrame)
+```{r covariates}
+covariates |> str()
+```
+
+## Exposome (DataFrame)
+```{r exposome}
+exposome |> str()
+```
+
+## Serum metabolome (ExpressionSet)
+```{r serum}
+exprs(metabol_serum) |> str()
+pData(metabol_serum) |> str()
+fData(metabol_serum) |> str()
+```
+
+## Urine metabolome (ExpressionSet)
+```{r urine}
+exprs(metabol_urine) |> str()
+pData(metabol_urine) |> str()
+fData(metabol_urine) |> str()
+```
+
+## Proteome (ExpressionSet)
+```{r proteome}
+exprs(proteome) |> str()
+pData(proteome) |> str()
+fData(proteome) |> str()
+```
+
+
+# Subset the observations present in all the datasets
+
+The datasets have a different number of observations.
+We want to keep only the observations present in all the datasets.
+```{r build_index}
+index <- (intersect(pData(metabol_serum)[,'ID'],
+                    pData(metabol_urine)[,'ID']) |>
+            intersect(pData(proteome)[,'ID']))
+all(index %in% phenotype[,'ID'])
+all(index %in% exposome[,'ID'])
+all(index %in% covariates[,'ID'])
+length(index)
+```
+
+Now we can subset all the datasets on the index.
+```{r subset}
+phenotype     <- phenotype[phenotype[ ,'ID'] %in% index, ]
+exposome      <- exposome[exposome[ ,'ID'] %in% index, ]
+covariates    <- covariates[covariates[ ,'ID'] %in% index, ]
+metabol_serum <- metabol_serum[ ,index]
+metabol_urine <- metabol_urine[ ,index]
+proteome      <- proteome[ ,index]
+```
+
+# Save the data on CSV
+
+Finally, we can save all the datasets on CSV files
+so we can load them on Python.
+
+```{r save}
+directory <- "./datasets"
+write.csv(codebook,   file.path(directory, "codebook.csv"))
+write.csv(phenotype,  file.path(directory, "phenotype.csv"))
+write.csv(exposome,   file.path(directory, "exposome.csv"))
+write.csv(covariates, file.path(directory, "covariates.csv"))
+
+write.csv(exprs(metabol_serum), file.path(directory, "metabol_serum_exprs.csv"))
+write.csv(pData(metabol_serum), file.path(directory, "metabol_serum_pData.csv"))
+write.csv(fData(metabol_serum), file.path(directory, "metabol_serum_fData.csv"))
+
+write.csv(exprs(metabol_urine), file.path(directory, "metabol_urine_exprs.csv"))
+write.csv(pData(metabol_urine), file.path(directory, "metabol_urine_pData.csv"))
+write.csv(fData(metabol_urine), file.path(directory, "metabol_urine_fData.csv"))
+
+write.csv(exprs(proteome), file.path(directory, "proteome_exprs.csv"))
+write.csv(pData(proteome), file.path(directory, "proteome_pData.csv"))
+write.csv(fData(proteome), file.path(directory, "proteome_fData.csv"))
+```
+
+***
+
+```{r sessioninfo}
+sessionInfo()
+```
