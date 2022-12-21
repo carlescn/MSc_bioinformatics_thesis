@@ -79,7 +79,7 @@ def draw_embeddings(z, labels, centroids=None, legend_title="Labels", alpha=0.2,
     plt.show()
     
     
-def draw_clusters_assignments(z, true_labels, clusters, centroids=None, alpha=0.2, figsize=(16,8)):
+def draw_clusters_assignments(z, true_labels, cluster_labels, centroids=None, alpha=0.2, figsize=(16,8)):
     """
     Draw two side by side scatterplots of the first 2 dimensions of the embeddings on the latent space.
     Left plot: color the points depending on its cluster assignment.
@@ -106,13 +106,13 @@ def draw_clusters_assignments(z, true_labels, clusters, centroids=None, alpha=0.
             K: number of clusters)
     """
     
-    confusion_matrix = sklearn.metrics.confusion_matrix(true_labels, clusters)
-    clusters = confusion_matrix.argmax(0)[clusters]
+    confusion_matrix = sklearn.metrics.confusion_matrix(true_labels, cluster_labels)
+    clusters = confusion_matrix.argmax(0)[cluster_labels]
     correct_labels = [x for x in (clusters == true_labels)]
     
     fig, axes = plt.subplots(1, 2, figsize=figsize)
-    _draw_plot(axes[0], z, clusters, centroids=centroids, legend_title="Clusters", cmap="tab10", alpha=alpha)
-    _draw_plot(axes[1], z, correct_labels, centroids=centroids, legend_labels=["Incorrect", "Correct"], legend_title="Assignment", cmap="Set1", alpha=alpha)
+    _draw_plot(axes[0], z, cluster_labels, centroids=centroids, legend_title="Clusters", cmap="tab10", alpha=alpha)
+    _draw_plot(axes[1], z, correct_labels, centroids=centroids, legend_labels=["Mismatch", "Match"], legend_title="Assignment", cmap="Set1", alpha=alpha)
     
     plt.tight_layout()
     
