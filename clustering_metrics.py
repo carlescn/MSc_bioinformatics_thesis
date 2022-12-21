@@ -15,19 +15,19 @@ def _draw_heatmap(confusion_matrix):
     heatmap.set(xlabel='clusters', ylabel='true labels')
     
 
-def evaluate_clustering(cluster_assignments, data, true_labels):
+def evaluate_clustering(data, true_labels, cluster_assignments):
     """
     Evaluates the clustering performance given the cluster assignments.
     Also, calls _draw_heatmap() on the confusion matrix of the cluster assignments vs the true labels.
     
     Parameters:
     -----------
-    cluster_assignments : array_like
-        Cluster assignments of the data.
     data : array_like
         Data to evaluate the model.
     true_labels : list
         True labels of the data.
+    cluster_assignments : array_like
+        Cluster assignments of the data.
         
     Returns:
     --------
@@ -44,21 +44,21 @@ def evaluate_clustering(cluster_assignments, data, true_labels):
            }
 
 
-def evaluate_model(clustering_method, encode_method, data, true_labels):
+def evaluate_model(data, true_labels, clustering_method, encode_method):
     """
     Evaluates the model clustering performance:
     Computes the cluster assignment and embeddings and calls evaluate_clustering().
     
     Parameters:
     -----------
-    clustering_method : method
-        Model method (or function) which returns the cluster assignments.
-    encode_method : method
-        Model method (or function) which returns the embeddings on the latent space.
     data : array_like
         Data to evaluate the model.
     true_labels : list
         True labels of the data.
+    clustering_method : method
+        Model method (or function) which returns the cluster assignments.
+    encode_method : method
+        Model method (or function) which returns the embeddings on the latent space.
         
     Returns:
     --------
@@ -67,4 +67,4 @@ def evaluate_model(clustering_method, encode_method, data, true_labels):
     """
     embeddings = encode_method(data)
     cluster_assignments = clustering_method(data)
-    return evaluate_clustering(cluster_assignments, embeddings, true_labels)
+    return evaluate_clustering(embeddings, true_labels, cluster_assignments)
