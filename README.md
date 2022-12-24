@@ -5,8 +5,8 @@ my implementation of some deep clustering models
 used in my MSc thesis.
 It also contains
 the code used to train the models
-en multiple datasets
-and a comparative of the clustering performances achieved.
+on multiple datasets
+and a summary of the clustering performances achieved.
 
 The deep learning models implemented are:
 
