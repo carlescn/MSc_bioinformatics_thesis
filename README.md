@@ -1,3 +1,9 @@
+# NOTA ALS PROFESSORS
+
+Aquest repositori s'està actualitzant continuament a mesura que abança el projecte.
+Els arxius en l'estat corresponent a l'entrega de la PAC3 es poden trobar a
+[https://github.com/carlescn/MSc_bioinformatics_thesis/tree/PAC3](https://github.com/carlescn/MSc_bioinformatics_thesis/tree/PAC3)
+
 # Deep clustering models for metabolomics data
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3.0-blue.svg?logo=)](https://github.com/carlescn/MSc_bioinformatics_thesis/blob/main/LICENSE)
