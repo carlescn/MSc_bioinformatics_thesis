@@ -1,6 +1,6 @@
 # NOTA ALS PROFESSORS
 
-Aquest repositori s'està actualitzant continuament a mesura que abança el projecte.
+Aquest repositori s'està actualitzant contínuament a mesura que avança el projecte.
 Els arxius en l'estat corresponent a l'entrega de la PAC3 es poden trobar a
 [https://github.com/carlescn/MSc_bioinformatics_thesis/tree/PAC3](https://github.com/carlescn/MSc_bioinformatics_thesis/tree/PAC3)
 
@@ -19,12 +19,12 @@ the code written to train the models on multiple datasets
 and a summary of the clustering performances achieved.
 
 The objective of the thesis was
-to imlepement a VAE based deep clustering model
+to implement a VAE based deep clustering model
 and apply it on metabolomics data,
 and then compare the resulting clustering with
 more classical techniques.
 I expected that the found clusters
-would lend themeselfs to some biological interpretation.
+would lend themselves to some biological interpretation.
 
 The deep learning models implemented here are:
 
@@ -42,7 +42,7 @@ For the training process, I leveraged the virtual machines provided by
 
 
 The models where first trained on the
-[MNIST dataset](https://doi.org/10.1109/MSP.2012.2211477)
+[MNIST data set](https://doi.org/10.1109/MSP.2012.2211477)
 and the clustering performance was measured
 using multiple metrics
 (Accuracy, Rand Index, Mutual Information, Silhouette).
@@ -50,7 +50,7 @@ The results where then compared to some classic clustering techniques
 (K-Means and GMM over the raw data and over the PCA transformation).
 
 Then, the best performing models (DEC, VaDE)
-where evaluated on the [ExposomeChallenge2021 dataset](https://arxiv.org/abs/2202.01680),
+where evaluated on the [ExposomeChallenge2021 data set](https://arxiv.org/abs/2202.01680),
 which contains metabolomics data.
 The results where also compared with come classic clustering techniques.
 *(work in progress)*
@@ -70,13 +70,13 @@ The results where also compared with come classic clustering techniques.
 - `train_models_on_MNIST` Folder that contains
   some Jupyter Notebooks
   where I train the different models on the MNIST dataset,
-  then I evaluate their clustering perfomance
+  then I evaluate their clustering performance
   and compare it to some classic clustering techniques
   (see `results.ipynb` for a summary).
 - `train_models_on_ExposomeChallenge` Folder that contains
   some Jupyter Notebooks
-  where I train the different models on the ExposomeChallenge2021 dataset,
-  then I evaluate their clustering perfomance
+  where I train the different models on the ExposomeChallenge2021 data set,
+  then I evaluate their clustering performance
   and compare it to some classic clustering techniques.
 - `_learning_keras` Folder that contains
   some Jupyter Notebooks
