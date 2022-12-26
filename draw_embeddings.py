@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import sklearn.metrics
 
 
-def _draw_plot(ax, points, labels, centroids=None, legend_labels=None, legend_title="Labels", cmap="tab10", alpha=0.2):    
+def _draw_plot(ax, points, labels, centroids=None, 
+               title=None, legend_title=None, legend_labels=None, 
+               cmap="tab10", alpha=0.7):    
     """
     Should by called by draw_embeddings() or draw_clusters_assignments().
     Draw a 2D scatterplot of the first two dimensions of the argument points.
@@ -18,13 +20,15 @@ def _draw_plot(ax, points, labels, centroids=None, legend_labels=None, legend_ti
         Indeces to color and label the plotted points.
     centroids : array_like(float, shape=(K, D))*, optional(default=None)
         Centroids (points on the latent space) to plot.
+    title : str, optional(default=None)
+        Text to display as the plot title.
+    legend_title : str, optional(default=None)
+        Text to display as the legend title.
     legend_labels : list(str, len=C)*, optional(default=None)
         Text to display as the legend labels.
-    legend_title : str, optional(default="Labels")
-        Text to display as the legend title.
     cmap : str, optional(default="tab10")
         Colormap to use
-    alpha : float (optional, default=0.2)
+    alpha : float (optional, default=0.7)
         Sets the transparency of the plotted points.
 
     *(where D >= 2: number of dimmentions of the latent space.
@@ -34,10 +38,9 @@ def _draw_plot(ax, points, labels, centroids=None, legend_labels=None, legend_ti
     """
     
     scatter = ax.scatter(points[:,0], points[:,1], label=labels, c=labels, cmap=cmap, alpha=alpha, linewidths=0)
-
+    ax.title.set_text(title)
     if centroids is not None:
-        plt.scatter(centroids[:,0], centroids[:,1], c="black", marker="x")
-    
+        ax.scatter(centroids[:,0], centroids[:,1], c="black", marker="x")
     if legend_labels is None:
         leg = ax.legend(*scatter.legend_elements(), title=legend_title)
     else:
@@ -49,7 +52,7 @@ def _draw_plot(ax, points, labels, centroids=None, legend_labels=None, legend_ti
     
     
 
-def draw_embeddings(z, labels, centroids=None, legend_title="Labels", alpha=0.2, figsize=(10,10)):
+def draw_embeddings(z, labels, centroids=None, legend_title=None, alpha=0.7, figsize=(5,5)):
     """
     Draw a scatterplot of the first 2 dimensions of the embeddings on the latent space.
     Optionally, superimpose the cluster centroids on the plot.
@@ -62,11 +65,11 @@ def draw_embeddings(z, labels, centroids=None, legend_title="Labels", alpha=0.2,
         Indeces to color and label the plotted points.
     centroids : array_like(float, shape=(K, D))*, optional(default=None)
         Centroids (points on the latent space) to plot.
-    legend_title : str, optional(default="Labels")
+    legend_title : str, optional(default=None)
         Text to display as the legend title.
-    alpha : float, optional(default=0.2)
+    alpha : float, optional(default=0.7)
         Sets the transparency of the plotted points.
-    figsize : tuple(float, len=2), optional(default=(10,10))
+    figsize : tuple(float, len=2), optional(default=(5,5))
         Size of the figure to display.
 
     *(where D >= 2: number of dimmentions of the points space.
@@ -79,11 +82,12 @@ def draw_embeddings(z, labels, centroids=None, legend_title="Labels", alpha=0.2,
     plt.show()
     
     
-def draw_clusters_assignments(z, true_labels, cluster_labels, centroids=None, alpha=0.2, figsize=(16,8)):
+def draw_matched_labels(z, true_labels, cluster_labels, centroids=None, alpha=0.7, figsize=(12,4)):
     """
-    Draw two side by side scatterplots of the first 2 dimensions of the embeddings on the latent space.
-    Left plot: color the points depending on its cluster assignment.
-    Right plot: color the points depending on if its cluster assignment matches de true label.
+    Draw three side by side scatterplots of the first 2 dimensions of the embeddings on the latent space.
+    Left plot: cluster assignment.
+    Middle plot: true labels.
+    Right plot: matches between both labels.
     Optionally, superimpose the centroids of the found clusters on the plot.
         
     Parameters:
@@ -92,13 +96,13 @@ def draw_clusters_assignments(z, true_labels, cluster_labels, centroids=None, al
         Embeddings (points on the latent space) to plot.
     true_labels : list(float, len=N)*
         True labels for the embeddings.
-    clusters : list(float, len=N)*
+    cluster_labels : list(float, len=N)*
         Cluster assignments for the embeddings.
     centroids : array_like(float, shape=(K, D))*, optional(default=None)
         Centroids (points on the latent space) to plot.
-    alpha : float, optional(default=0.2)
+    alpha : float, optional(default=0.7)
         Sets the transparency of the plotted points.
-    figsize : tuple(float, len=2), optional(default=(16, 8))
+    figsize : tuple(float, len=2), optional(default=(12, 4))
         Size of the figure to display.
 
     *(where D >= 2: number of dimmentions of the latent space.
@@ -108,12 +112,15 @@ def draw_clusters_assignments(z, true_labels, cluster_labels, centroids=None, al
     
     confusion_matrix = sklearn.metrics.confusion_matrix(true_labels, cluster_labels)
     clusters = confusion_matrix.argmax(0)[cluster_labels]
-    correct_labels = [x for x in (clusters == true_labels)]
-    
-    fig, axes = plt.subplots(1, 2, figsize=figsize)
-    _draw_plot(axes[0], z, cluster_labels, centroids=centroids, legend_title="Clusters", cmap="tab10", alpha=alpha)
-    _draw_plot(axes[1], z, correct_labels, centroids=centroids, legend_labels=["Mismatch", "Match"], legend_title="Assignment", cmap="Set1", alpha=alpha)
-    
+    matched_labels = [x for x in (clusters == true_labels)]
+
+    fig, axes = plt.subplots(1, 3, figsize=figsize)
+    _draw_plot(axes[0], z, cluster_labels, centroids=centroids, alpha=alpha, 
+               title="Cluster labels")
+    _draw_plot(axes[1], z, true_labels, centroids=centroids, alpha=alpha, 
+               title="True labels")
+    _draw_plot(axes[2], z, matched_labels, centroids=centroids, alpha=alpha, cmap="Set1",
+               title="Matched labels", legend_labels=("Mismatch", "Match"))
     plt.tight_layout()
     
     
