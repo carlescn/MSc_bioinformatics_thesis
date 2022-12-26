@@ -77,8 +77,8 @@ def draw_embeddings(z, labels, centroids=None, legend_title=None, alpha=0.7, fig
             K: number of clusters)
     """
     
-    plt.figure(figsize=figsize)
-    _draw_plot(plt, z, labels, centroids=centroids, legend_title=legend_title, alpha=alpha)
+    fig, ax = plt.subplots(1, 1, figsize=(5,5))
+    _draw_plot(ax, z, labels, centroids=centroids, legend_title=legend_title, alpha=alpha)
     plt.show()
     
     
