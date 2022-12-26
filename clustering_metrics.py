@@ -15,7 +15,7 @@ def _draw_heatmap(confusion_matrix):
     heatmap.set(xlabel='clusters', ylabel='true labels')
     
 
-def evaluate_clustering(data, true_labels, cluster_assignments):
+def evaluate_clustering(data, true_labels, cluster_assignments, heatmap=True):
     """
     Evaluates the clustering performance given the cluster assignments.
     Also, calls _draw_heatmap() on the confusion matrix of the cluster assignments vs the true labels.
@@ -35,8 +35,9 @@ def evaluate_clustering(data, true_labels, cluster_assignments):
         A dictionary containing some performance metrics.
     """
     confusion_matrix = sklearn.metrics.confusion_matrix(true_labels, cluster_assignments)
-    _draw_heatmap(confusion_matrix)
     matched_labels = confusion_matrix.argmax(0)[cluster_assignments]
+    if heatmap:
+        _draw_heatmap(confusion_matrix)
     return {"Acc" : sklearn.metrics.accuracy_score(true_labels, matched_labels),
             "ARI" : sklearn.metrics.adjusted_rand_score(true_labels, matched_labels),
             "AMI" : sklearn.metrics.adjusted_mutual_info_score(true_labels, matched_labels),
@@ -44,7 +45,7 @@ def evaluate_clustering(data, true_labels, cluster_assignments):
            }
 
 
-def evaluate_model(data, true_labels, clustering_method, encode_method):
+def evaluate_model(data, true_labels, clustering_method, encode_method, heatmap=True):
     """
     Evaluates the model clustering performance:
     Computes the cluster assignment and embeddings and calls evaluate_clustering().
@@ -67,4 +68,4 @@ def evaluate_model(data, true_labels, clustering_method, encode_method):
     """
     embeddings = encode_method(data)
     cluster_assignments = clustering_method(data)
-    return evaluate_clustering(embeddings, true_labels, cluster_assignments)
+    return evaluate_clustering(embeddings, true_labels, cluster_assignments, heatmap=heatmap)
