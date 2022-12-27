@@ -67,13 +67,13 @@ The results where also compared with come classic clustering techniques.
   some functions used to evaluate
   the performance of the models,
   measuring some metrics of clustering quality.
-- `train_models_on_MNIST` Folder that contains
+- `MNIST` Folder that contains
   some Jupyter Notebooks
   where I train the different models on the MNIST dataset,
   then I evaluate their clustering performance
   and compare it to some classic clustering techniques
   (see `results.ipynb` for a summary).
-- `train_models_on_ExposomeChallenge` Folder that contains
+- `ExposomeChallenge` Folder that contains
   some Jupyter Notebooks
   where I train the different models on the ExposomeChallenge2021 data set,
   then I evaluate their clustering performance
