@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.metrics
 
-
 def _draw_plot(ax, points, labels, centroids=None, 
                title=None, legend_title=None, legend_labels=None, 
                cmap="tab10", alpha=0.7):    
@@ -16,7 +15,7 @@ def _draw_plot(ax, points, labels, centroids=None,
         Axes on which to draw the plot
     points : array_like(float, shape=(N, D))*
         Embeddings (points on the latent space) to plot.
-    labels : list(float, len=N)*
+    labels : array_like(int, shape=(N, 1))*
         Indeces to color and label the plotted points.
     centroids : array_like(float, shape=(K, D))*, optional(default=None)
         Centroids (points on the latent space) to plot.
@@ -61,7 +60,7 @@ def draw_embeddings(z, labels, centroids=None, legend_title=None, alpha=0.7, fig
     -----------
     z : array_like(float, shape=(N, D))*
         Embeddings (points on the latent space) to plot.
-    labels : list(float, len=N)*
+    labels : array_like(int, shape=(N, 1))*
         Indeces to color and label the plotted points.
     centroids : array_like(float, shape=(K, D))*, optional(default=None)
         Centroids (points on the latent space) to plot.
@@ -94,9 +93,9 @@ def draw_matched_labels(z, true_labels, cluster_labels, centroids=None, alpha=0.
     -----------
     z : array_like(float, shape=(N, D))*
         Embeddings (points on the latent space) to plot.
-    true_labels : list(float, len=N)*
+    true_labels : array_like(int, shape=(N, 1))*
         True labels for the embeddings.
-    cluster_labels : list(float, len=N)*
+    cluster_labels : array_like(int, shape=(N, 1))*
         Cluster assignments for the embeddings.
     centroids : array_like(float, shape=(K, D))*, optional(default=None)
         Centroids (points on the latent space) to plot.
@@ -122,7 +121,48 @@ def draw_matched_labels(z, true_labels, cluster_labels, centroids=None, alpha=0.
     _draw_plot(axes[2], z, matched_labels, centroids=centroids, alpha=alpha, cmap="Set1",
                title="Matched labels", legend_labels=("Mismatch", "Match"))
     plt.tight_layout()
+
     
+def draw_multiple_labels(z, labels_dict, centroids=None, alpha=0.7, subplot_size=(4, 4), max_cols=5):
+    """
+    Draws the same scatterplot of the first 2 dimensions of the embeddings on the latent space,
+    each one with a different labels array.
+    The number of rows and columns of the subplots is determined by the number of plots to be drawn
+    and the max_cols argument.
+    Optionally, superimpose the centroids of the found clusters on the plot.
+        
+    Parameters:
+    -----------
+    z : array_like(float, shape=(N, D))*
+        Embeddings (points on the latent space) to plot.
+    labels_dict : dictionary (len=L)*
+        keys: str
+            The title for each plot.
+        values: array_like(int, shape=(N, 1))*
+            The labels for each plot.
+    centroids : array_like(float, shape=(K, D))*, optional(default=None)
+        Centroids (points on the latent space) to plot.
+    alpha : float, optional(default=0.7)
+        Sets the transparency of the plotted points.
+    subplot_size: tuple(float, len=2), optional(default=(4,4)
+        Size of each subplot.
+    max_cols : int, optional(default=5)
+        Maximum number of columns for the subplots.
+
+    *(where D >= 2: number of dimmentions of the latent space.
+            N: number of points
+            K: number of clusters
+            L: number of arrays of labels)
+    """
+    num_plots = len(labels_dict)
+    num_cols = min(num_plots, max_cols)
+    num_rows = num_plots // max_cols + 1
+    figsize = (subplot_size[0] * num_cols, subplot_size[1] * num_rows)
+
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
+    for i, (title, labels) in enumerate(labels_dict.items()):
+        _draw_plot(axes[i], z, labels, centroids=centroids, alpha=alpha, title=title)
+    plt.tight_layout()
     
 def compare_reconstructed_images_MNIST(dataset, encoder, decoder, labels, old_figure=None, n=5):
     """
