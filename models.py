@@ -394,3 +394,16 @@ class AutoEncoderForPretrain(models.Model):
         z = self.encode(x)
         recon_x = self.decode(z)
         return recon_x
+    
+    # there is no gradient for variable z_logvar
+    # so tensorflow prints a warning every time
+    # workaround: set unconnected_gradients=tf.UnconnectedGradients.ZERO
+    def train_step(self, x):
+        with tf.GradientTape() as tape:
+            recon_x = self(x)
+            loss = self.compiled_loss(x, recon_x, regularization_losses=self.losses)
+        gradients = tape.gradient(loss, self.trainable_weights,
+                                  unconnected_gradients=tf.UnconnectedGradients.ZERO)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
+        self.compiled_metrics.update_state(x, recon_x,x)
+        return {m.name: m.result() for m in self.metrics}
