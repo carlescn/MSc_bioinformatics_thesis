@@ -102,7 +102,10 @@ class DEC(models.Model):
         self.encoder = encoder
         
         latent_dim = encoder.outputs[0].shape[1]
-        self.centroids = self.add_weight(name='centroids', shape=(n_clusters, latent_dim), trainable=True, initializer=tf.keras.initializers.random_normal)
+        self.centroids = self.add_weight(name='centroids',
+                                         shape=(n_clusters, latent_dim),
+                                         trainable=True,
+                                         initializer=tf.keras.initializers.random_normal)
         
         self.loss_tracker = keras.metrics.Mean(name="loss")
 
@@ -130,9 +133,9 @@ class DEC(models.Model):
             q = self.soft_assignment(x)
             loss = clustering_loss_function(q, p)   # Reverse KL (zero forcing) achieves tighter clusters
             # loss = clustering_loss_function(p, q) # Forward KL (zero avoiding)
-            gradients = tape.gradient(loss, self.trainable_weights)
-            self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
-            self.loss_tracker.update_state(loss)
+        gradients = tape.gradient(loss, self.trainable_weights)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
+        self.loss_tracker.update_state(loss)
         return {"loss": self.loss_tracker.result()}
 
 
@@ -204,17 +207,16 @@ class VAE(models.Model):
     def train_step(self, x):
         with tf.GradientTape() as tape:
             recon_x, z_mu, z_logvar = self(x)
-            
             regularizatoin_loss = self.regularization_loss(z_mu, z_logvar)
             reconstruction_loss = self.reconstruction_loss(x, recon_x)
             total_loss = regularizatoin_loss + reconstruction_loss
             
-            gradients = tape.gradient(total_loss, self.trainable_weights)
-            self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
-            
-            self.total_loss_tracker.update_state(total_loss)
-            self.regularization_loss_tracker.update_state(regularizatoin_loss)
-            self.reconstruction_loss_tracker.update_state(reconstruction_loss)
+        gradients = tape.gradient(total_loss, self.trainable_weights)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
+
+        self.total_loss_tracker.update_state(total_loss)
+        self.regularization_loss_tracker.update_state(regularizatoin_loss)
+        self.reconstruction_loss_tracker.update_state(reconstruction_loss)
 
         return {"total_loss": self.total_loss_tracker.result(),
                 "reg_loss": self.regularization_loss_tracker.result(),
@@ -225,7 +227,10 @@ class ClusteringVAE(VAE):
     def __init__(self, encoder, decoder, n_clusters, clustering_loss_weight=1, **kwargs):
         super(ClusteringVAE, self).__init__(encoder, decoder, **kwargs)
         latent_dim = encoder.outputs[0].shape[1]
-        self.centroids = self.add_weight(name='centroids', shape=(n_clusters, latent_dim), trainable=True, initializer=tf.keras.initializers.random_normal)
+        self.centroids = self.add_weight(name='centroids',
+                                         shape=(n_clusters, latent_dim),
+                                         trainable=True,
+                                         initializer=tf.keras.initializers.random_normal)
         self.clustering_loss_weight=clustering_loss_weight
         self.clustering_loss_tracker = keras.metrics.Mean(name="clust_loss")
 
@@ -254,19 +259,19 @@ class ClusteringVAE(VAE):
             recon_x = self.decode(z)
             q = _compute_soft_assignment(z, self.centroids)
             
-            regularizatoin_loss = self.regularization_loss(z_mu, z_logvar)
+            regularization_loss = self.regularization_loss(z_mu, z_logvar)
             reconstruction_loss = self.reconstruction_loss(x, recon_x)
             clustering_loss = clustering_loss_function(q, p)   # Reverse KL (zero forcing) achieves tighter clusters
             # clustering_loss = clustering_loss_function(p, q) # Forward KL (zero avoiding)
-            total_loss = regularizatoin_loss + reconstruction_loss + self.clustering_loss_weight*clustering_loss
-            
-            gradients = tape.gradient(total_loss, self.trainable_weights)
-            self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
-            
-            self.total_loss_tracker.update_state(total_loss)
-            self.regularization_loss_tracker.update_state(regularizatoin_loss)
-            self.reconstruction_loss_tracker.update_state(reconstruction_loss)
-            self.clustering_loss_tracker.update_state(clustering_loss)
+            total_loss = regularization_loss + reconstruction_loss + self.clustering_loss_weight*clustering_loss
+
+        gradients = tape.gradient(total_loss, self.trainable_weights)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
+
+        self.total_loss_tracker.update_state(total_loss)
+        self.regularization_loss_tracker.update_state(regularizatoin_loss)
+        self.reconstruction_loss_tracker.update_state(reconstruction_loss)
+        self.clustering_loss_tracker.update_state(clustering_loss)
         
         return {"total_loss": self.total_loss_tracker.result(),
                 "reg_loss": self.regularization_loss_tracker.result(),
@@ -295,13 +300,20 @@ class VaDE(models.Model):
     def __init__(self, n_classes, vae_encoder, vae_decoder, **kwargs):
         super(VaDE, self).__init__(**kwargs)
         latent_dim = vae_encoder.outputs[0].shape[1]
-        self._pi = self.add_weight(name='pi', shape=(n_classes), trainable=True, initializer=tf.keras.initializers.zeros)
-        self.mu = self.add_weight(name='mu', shape=(n_classes, latent_dim), trainable=True, initializer=tf.keras.initializers.random_normal)
-        self.logvar =  self.add_weight(name='logvar', shape=(n_classes, latent_dim), trainable=True, initializer=tf.keras.initializers.random_normal)
-        
+        self._pi = self.add_weight(name='pi',
+                                   shape=(n_classes),
+                                   trainable=True,
+                                   initializer=tf.keras.initializers.zeros)
+        self.mu = self.add_weight(name='mu',
+                                  shape=(n_classes, latent_dim),
+                                  trainable=True,
+                                  initializer=tf.keras.initializers.random_normal)
+        self.logvar =  self.add_weight(name='logvar',
+                                       shape=(n_classes, latent_dim),
+                                       trainable=True,
+                                       initializer=tf.keras.initializers.random_normal)
         self.encoder = vae_encoder
         self.decoder = vae_decoder
-        
         self.loss_tracker = keras.metrics.Mean(name="loss")
             
     @property
@@ -370,9 +382,9 @@ class VaDE(models.Model):
         with tf.GradientTape() as tape:
             recon_x, mu, logvar = self(x)
             loss = self.loss_function(x, recon_x, mu, logvar)
-            gradients = tape.gradient(loss, self.trainable_weights)
-            self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
-            self.loss_tracker.update_state(loss)
+        gradients = tape.gradient(loss, self.trainable_weights)
+        self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
+        self.loss_tracker.update_state(loss)
         return {"loss": self.loss_tracker.result()}
 
     
