@@ -156,12 +156,17 @@ def draw_multiple_labels(z, labels_dict, centroids=None, alpha=0.7, subplot_size
     """
     num_plots = len(labels_dict)
     num_cols = min(num_plots, max_cols)
-    num_rows = num_plots // max_cols + 1
+    num_rows = np.ceil(num_plots / max_cols).astype('int')
     figsize = (subplot_size[0] * num_cols, subplot_size[1] * num_rows)
-
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
-    for i, (title, labels) in enumerate(labels_dict.items()):
-        _draw_plot(axes[i], z, labels, centroids=centroids, alpha=alpha, title=title)
+    
+    _, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
+    if num_rows == 1:
+        for i, (title, labels) in enumerate(labels_dict.items()):
+            _draw_plot(axes[i], z, labels, centroids=centroids, alpha=alpha, title=title)
+    else:
+        for i, (title, labels) in enumerate(labels_dict.items()):
+            i, j = i // max_cols, i % max_cols
+            _draw_plot(axes[i][j], z, labels, centroids=centroids, alpha=alpha, title=title)
     plt.tight_layout()
     
 def compare_reconstructed_images_MNIST(dataset, encoder, decoder, labels, old_figure=None, n=5):
