@@ -1,0 +1,6 @@
+rl_method,clust_method,n_clusters,labels
+DEC,K-Means,2,[1 0 0 ... 0 0 1]
+DEC,K-Means,3,[0 0 0 ... 2 0 2]
+DEC,K-Means,4,[0 1 1 ... 3 0 0]
+DEC,K-Means,6,[2 1 3 ... 5 0 1]
+DEC,K-Means,7,[4 2 5 ... 5 2 2]
