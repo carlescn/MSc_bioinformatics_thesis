@@ -1,0 +1,209 @@
+---
+title: "Try the clValid package on the Exposome Challenge data set"
+author: "Carles Criado Ninà"
+output:
+  html_document: 
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    number_sections: true
+    theme: cerulean
+---
+
+<style>
+  <!-- To have nice indentation in toc_float. Copied from:
+  https://github.com/rstudio/rmarkdown/issues/1909 -->
+  .tocify-header {
+    text-indent: initial;
+  }
+  .tocify-subheader > .tocify-item {
+    text-indent: initial;
+    padding-left: 2em;
+  }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  cache = TRUE,
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r libaries, echo=FALSE}
+library(clValid)
+```
+
+***
+
+# Introduction
+
+[clValid](https://www.rdocumentation.org/packages/clValid/versions/0.7/topics/clValid)
+is an R package
+that provides a way to evaluate different clustering methods
+on the same data.
+It reports validation metrics
+that can be chosen between three classes:
+"internal", "stability", and "biological".
+
+Using this package,
+I will compare a set of clustering methods
+over a range of cluster numbers,
+which will become a grid of 8 x 10 "parameters" to explore.
+Because of the size of the grid,
+I choose to report only the "internal" metrics,
+since they are the fastest to compute
+and this study does not aim to be a profound exploration of the data.
+
+First, I will evaluate the results over the metabolomics raw data.
+Then, I will do a PCA analysis,
+select the numbers of PCs that explain 80% of the variance,
+and repeat the analysis on the learned features.
+Finally, I will repeat the same two steps on the exposome data.
+
+
+# Load the data
+
+First, we load the data previously saved on CSV files.
+
+```{r load_data}
+directory <- "./ExposomeChallengeData/datasets"
+
+# Exposome and metabolomics data (min-max normalized)
+metabol_exprs <- read.csv(file.path(directory, "metabol_joint_exprs_minmax.csv"), row.names = 1)
+exposome <- read.csv(file.path(directory, "exposome_minmax.csv"), row.names = 1)
+```
+
+
+# Metabolomics data
+
+## Raw data
+
+Try clValid on the raw data:
+
+```{r clValid_metabol_raw}
+CL_METHODS <- c("hierarchical", "kmeans", "diana", "som", "sota", "pam", "clara", "agnes")
+N_CLUST <- 2:10
+MAX_ITEMS <- nrow(metabol_exprs)
+
+clval_metabol <- clValid(metabol_exprs,
+                       nClust = N_CLUST,
+                       clMethods = CL_METHODS,
+                       maxitems = MAX_ITEMS,
+                       validation = "internal",
+                       metric = "euclidean",
+                       method = "ward")
+
+optimalScores(clval_metabol)
+plot(clval_metabol)
+```
+
+No clustering method seem to find an optimal number of clusters.
+Almost all of them seem to achieve better metrics
+with a higher number of clusters.
+I could use the elbow method to select an optimal number,
+but it doesn't seem to be informative.
+
+
+## PCA
+
+Try clValid on the learned features (PCA):
+
+```{r clValid_metabol_pca}
+EXPLAINED_VARIANCE = 0.8
+
+metabol_pca <- prcomp(metabol_exprs)
+plot(metabol_pca)
+num_pcs <- sum(summary(metabol_pca)$importance[3,] <= EXPLAINED_VARIANCE)
+metabol_pca <- metabol_pca$x[,1:num_pcs]
+
+clval_metabol_pca <- clValid(metabol_pca,
+                       nClust = N_CLUST,
+                       clMethods = CL_METHODS,
+                       maxitems = MAX_ITEMS,
+                       validation = "internal",
+                       metric = "euclidean",
+                       method = "ward")
+
+optimalScores(clval_metabol_pca)
+plot(clval_metabol_pca)
+```
+
+The PCA transformation doesn't seem to help,
+the results are very similar.
+
+
+## Try clValid on the exposome data
+
+Try clValid on the raw data:
+
+```{r clValid_exposome_raw}
+clval_exposome <- clValid(exposome,
+                       nClust = N_CLUST,
+                       clMethods = CL_METHODS,
+                       maxitems = MAX_ITEMS,
+                       validation = "internal",
+                       metric = "euclidean",
+                       method = "ward")
+
+optimalScores(clval_exposome)
+plot(clval_exposome)
+```
+
+Here, I find that the majority of the methods
+converge in an **optimal number of 6 clusters**,
+which is confirms the results I found
+with both *classic* clustering methods
+and deep clustering methods (see Jupyter notebooks).
+
+
+Try clValid on the learned features (PCA):
+
+```{r clValid_exposome_pca}
+exposome_pca <- prcomp(exposome)
+plot(exposome_pca)
+num_pcs <- sum(summary(exposome_pca)$importance[3,] <= EXPLAINED_VARIANCE)
+exposome_pca <- exposome_pca$x[,1:num_pcs]
+
+clval_exposome_pca <- clValid(exposome_pca,
+                       nClust = N_CLUST,
+                       clMethods = CL_METHODS,
+                       maxitems = MAX_ITEMS,
+                       validation = "internal",
+                       metric = "euclidean",
+                       method = "ward")
+
+optimalScores(clval_exposome_pca)
+plot(clval_exposome_pca)
+```
+
+The PCA converted data seem to reinforce the same result,
+finding again an optimal number 6 clusters,
+but with more pronounced differences.
+
+
+# Discussion
+
+The results obtained with this exploration
+are in line with what I found on my earlier exploration
+trying different clustering methods,
+both *classic* methods and using deep learning
+(see Jupyter notebooks).
+The metabolomics data as provided
+does not seem to lend itself to good clustering quality.
+
+On the other hand the exposome data
+shows a clear optimum number of 6 clusters
+with almost all the methods explored.
+On my earlier exploration
+I found that this clusters overlap with the classes of the variable *cohorts*,
+which suggests a that there is a strong batch effect on the data.
+
+
+
+# SessionInfo
+
+```{r sessioninfo}
+sessionInfo()
+```
