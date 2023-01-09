@@ -28,7 +28,6 @@ All the categorical variables where codified with numbers starting from 0.
 [[code in data_exploration.ipynb]](https://github.com/carlescn/MSc_bioinformatics_thesis/blob/main/ExposomeChallenge/data_exploration.ipynb)
 
 
-
 ## Clustering on the metabolomics data
 
 I joined the serum and urine metabolomics data
@@ -72,6 +71,9 @@ None of the methods achieved an improvement over the base metrics.
 
 All the code can be found on the corresponding notebooks 
 on the [cluster_metabolome_uncorrected](https://github.com/carlescn/MSc_bioinformatics_thesis/tree/main/ExposomeChallenge/cluster_metabolome_uncorrected) folder.
+The notebook [select_ae_hyperparams.ipynb](https://github.com/carlescn/MSc_bioinformatics_thesis/blob/main/ExposomeChallenge/select_ae_hyperparams.ipynb)
+contains the criteria used to select the optimal parameters
+for the autoencoder that is the base of both deep clustering methods.
 
 
 ## Clustering on the exposome data
@@ -105,6 +107,24 @@ The code can be found on the corresponding notebooks
 on the [cluster_metabolome_corrected](https://github.com/carlescn/MSc_bioinformatics_thesis/tree/main/ExposomeChallenge/cluster_metabolome_corrected)
 and [cluster_exposome_corrected](https://github.com/carlescn/MSc_bioinformatics_thesis/tree/main/ExposomeChallenge/cluster_exposome_corrected)
 folders.
+
+
+## clValid R package
+
+Finally,
+I tried the [clValid](https://www.rdocumentation.org/packages/clValid/versions/0.7/topics/clValid) R package,
+which provides a way to evaluate different clustering methods on the same data.
+
+Using this package,
+I compared a set of clustering methods over a range of cluster numbers.
+The results aligned with what I found before:
+the metabolomics data doesn't seem to lend itself for good clustering quality,
+while the exposome data shows a clear optimal number of 6 groups
+for all the methods evaluated.
+
+The code can be found on the
+[try_clvalid.Rmd](https://github.com/carlescn/MSc_bioinformatics_thesis/blob/main/ExposomeChallenge/try_clvalid.Rmd)
+and [try_clvalid.html](https://github.com/carlescn/MSc_bioinformatics_thesis/blob/main/ExposomeChallenge/try_clvalid.html) files.
 
 
 # Discussion
@@ -200,8 +220,6 @@ But the found clusters do not seem to have a biological interpretation.
 | Metabolome             | Classic (fet. sel.) | PCA         | K-Means     |              2 | asthma     |   0.89 |   0    |   0    |   0.09 |
 
 
-
-
 ## Top ARI results
 
 | Dataset   | Method          | FL method   | CL method   |   num clusters | variable   |   Acc. |   ARI. |   AMI. |   Sil. |
@@ -216,7 +234,6 @@ But the found clusters do not seem to have a biological interpretation.
 | Exposome  | Classic         | Raw data    | GMM         |              6 | cohort     |   0.96 |   0.93 |   0.94 |   0.12 |
 | Exposome  | Classic         | Raw data    | GMM         |              7 | age        |   0.59 |   0.48 |   0.59 |   0.1  |
 | Exposome  | Classic         | Raw data    | Agglo.      |              7 | age        |   0.59 |   0.48 |   0.58 |   0.1  |
-
 
 
 ## Top AMI results
