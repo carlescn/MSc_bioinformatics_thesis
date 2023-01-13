@@ -27,24 +27,39 @@
             \makeglossaries
             % Define acronyms:
             \newacronym{tfm}{TFM}{treball de final de màster}
+
             \newacronym{cq}{CQ}{qualitat de \textit{clustering} (\textit{clustering quality})}
-            \newacronym{ae}{AE}{\textit{autoencoder}}
             \newacronym{fl}{FL}{aprenentatge de característiques \textit{(feature learning)}}
             \newacronym{rl}{RL}{capa de representació \textit{(representation layer)}}
             \newacronym{lf}{LF}{característiques apreses \textit{(learned features)}}
+
+            \newacronym{pca}{PCA}{anàlisi de components principals}
+            \newacronym{kmeans}{K-means}{K-means}
+            \glsunset{kmeans}
+            \newacronym{gmm}{GMM}{model de barreja de gaussianes}
+            \newacronym{aglo}{Aglo.}{model aglomeratiu}
+
             \newacronym{mlp}{MLP}{\textit{multilayer perceptron}}
             \newacronym{cnn}{CNN}{\textit{convolutional neural network}}
             \newacronym{dbn}{DBN}{\textit{deep belief network}}
             \newacronym{gan}{GAN}{\textit{generative adversarial network}}
             \newacronym{lstm}{LSTM}{\textit{long short-term memory}}
+            \newacronym{ae}{AE}{\textit{autoencoder}}
             \newacronym{cae}{CAE}{\textit{convolutional autoencoder}}
             \newacronym{vae}{VAE}{\textit{variational autoencoder}}
             \newacronym{lstmae}{LSTM-AE}{\textit{long short-term memory autoencoder}}
             \newacronym{aae}{AAE}{\textit{adversarial autoencoder}}
             \newacronym{dae}{DAE}{\textit{denoising autoencoder}}
             \newacronym{sae}{SAE}{\textit{stacked autoencoder}}
-            \newacronym{elbo}{ELBO}{límit inferior de la evidència (\textit{evidenve lower bound})}
+            \newacronym{dec}{DEC}{Deep embedded clustering}
+            \newacronym{vade}{VaDE}{Variational Deep Embedding}
+
+            \newacronym{relu}{ReLU}{unitat lineal rectificada, (\textit{rectified linear unit})}
+            \glsunset{relu}
+            \newacronym{elbo}{ELBO}{límit inferior de la evidència (\textit{evidence lower bound})}
             \newacronym{kl}{KL}{Kullback-Leibler}
+            \newacronym{mnist}{MNIST}{\textit{Modified National Institute of Standards and Technology database}}
+
 
         %Insert names of references with \cref{}
         \usepackage[catalan,noabbrev,nameinlink]{cleveref}
@@ -77,6 +92,9 @@
 %        %Insert landscape page
 %        \usepackage{lscape}
 
+        % Tables with merged rows/columns
+        \usepackage{multirow}
+
 
 
 
@@ -89,10 +107,10 @@
 %}End Carles customization
 
 %Introducció de dades del treball
-\title{Desenvolupament d'un model de \textit{deep clustering} en dades metabolòmiques utilitzant un \textit{Variational Autoencoder}}
-\titcrt{VAE-DC en dades metabolòmiques} %Títol curt que apareixerà a la capçalera
+\title{Implemenació de models de \textit{deep clustering} en dades metabolòmiques.}
+\titcrt{\textit{Deep clustering} en dades metabolòmiques} %Títol curt que apareixerà a la capçalera
 \author{Carles Criado Ninà}
-\date{30 de febrer de 2099}
+\date{15 de gener de 2023}
 
 
 \nomPDC{Esteban Vegas Lozano}
@@ -101,9 +119,9 @@
 \area{Àrea 3}
 \idioma{Català}
 \credits{15}
-\parcla{clustering, deep learning, variational autoencoder, metabolomics}
+\parcla{clustering, deep learning, autoencoder, metabolomics}
 
-\licenc{ccBy}
+\licenc{ccBySa}
 %Possibles llicències
 %ccByNcNd
 %ccByNcSa
@@ -142,6 +160,8 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
 \chapter{Introducció}
     %Aquesta plantilla es concep com una guia per a l’estudiant. Es pot adaptar a les necessitats de cada treball, sempre que el/la tutor/a del treball hi estigui d’acord.
+
+\todo{Actualitzar tot segons estat final del projecte (aprofitar informes PAC2 i 3).}
 
     \section{Context i justificació del treball}
         %Punt de partida del treball (Quina és la necessitat a cobrir? Per què és un tema rellevant? Com es resol el problema de moment?) i aportació realitzada (Quin resultat es vol obtenir?).
@@ -269,9 +289,9 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     \section{Tècniques de \textit{clustering}}
     \label{s:state_cluster}
 
-        Les tècniques de \textit{clustering} són un conjunt de tècniques d'aprenentatge automàtic no supervisat que es basen en agrupar les dades en funció d'alguna mesura de la seva similitud, sense coneixement previ de l'estructura de les dades o el nombre de grups que es pretén obtenir.
+        Les tècniques de \textit{clustering} són un conjunt de tècniques d'aprenentatge automàtic no supervisat que es basen en agrupar les observacions en funció d'alguna mesura de la seva similitud, sense coneixement previ de l'estructura de les observacions o el nombre de grups que es pretén obtenir.
 
-        L'objectiu d'aquestes tècniques és separar les dades en diversos grups que siguin internament homogenis (els objectes dins el mateix grup són similars entre ells) i tinguin característiques diferents a la resta de grups.
+        L'objectiu d'aquestes tècniques és separar les dades en diversos grups que siguin internament homogenis (les observacions dins el mateix grup són similars entre ells) i tinguin característiques diferents a la resta de grups.
 
         Identificar aquests grups permet obtenir informació sobre l'estructura de les dades com la presència de patrons, i pot servir com a un punt de partida en l'exploració de les dades. Per exemple, aplicades a dades metabolòmiques, les tècniques de \textit{clustering} poden permetre identificar diferents tipus cel·lulars en funció de la seva expressió metabòlica \citep{Blekherman2011}.
 
@@ -308,7 +328,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         La majoria d'aproximacions actuals utilitzen una arquitectura basada en un \gls{ae} \citep{Karim2021}, donat que és capaç d'obtenir \gls{lf} eficients per realitzar \textit{clustering}.
 
 
-    \section{\textit{Autoencoder}}
+    \section{Autoencoder}
     \label{s:state_ae}
 
         L'arquitectura \gls{ae} està formada per dues parts: un codificador i un descodificador. La funció del codificador és representar l'entrada en un espai dimensional reduït, sovint un vector, anomenat codi. La funció del descodificador és reconstruir l'entrada original a partir del codi.
@@ -349,7 +369,13 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     %\end{itemize}
     %\textbf{L’estructuració dels capítols pot variar segons el tipus de treball.}
 
-    \section{Model de \textit{deep clustering}}
+    \section{Mètodes de \textit{clustering} clàssiques}
+    \label{s:metodes_classic}
+
+\todo{Breu explicació mètodes de clustering K-means, GMM, Agglomeratiu.}
+
+
+    \section{Models de \textit{deep clustering}}
     \label{s:metodes_dc}
 
     En aquest \gls{tfm}
@@ -370,6 +396,12 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     la \gls{rl} apresa permet la generació de mostres artificials
     similars a les dades d'entrenament.
     Això últim pot resultar útil com a tècnica d'augment de dades.
+
+    \subsection{Deep embedded clustering}
+    \label{s:metodes_dec}
+
+\todo{Explicació DEC. Traspassar aquí l'explicació del mètode de clustering.}
+
 
     \subsection{Variational Autoencoder}
     \label{s:metodes_vae}
@@ -719,6 +751,10 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
             \label{fig:vae_min}
         \end{figure}
 
+    \subsection{Varational Deep Embedding}
+    \label{s:metodes_vade}
+
+\todo{Explicació model VaDE}
 
 
     \subsection{Clustering}
@@ -804,7 +840,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         \end{figure}
 
 
-    \subsection{Mètriques d'avaluació}
+    \section{Mètriques d'avaluació}
     \label{s:metrics}
 
         Per validar la \gls{cq}
@@ -813,7 +849,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         Les mètriques de validació externa
         es basen en comparar els clústers obtinguts
         amb una partició de les dades coneguda prèviament,
-        que es considera la partició "correcta".
+        que es considera la partició \textit{correcta}.
         Les mètriques de validació interna
         no utilitzen dades externes i
         es basen en mesures observables
@@ -857,7 +893,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 %            i $c_i$ és el centroide del clúster.
 %
 %            De manera similar,
-%            el nivell de separació és pot mesurar
+%            el nivell de separació es pot mesurar
 %            mitjançant la \gls{ssb}:
 %            \begin{equation}
 %            \label{eq:ssn}
@@ -955,6 +991,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                 en conceptes de la teoria de la informació.
             \end{itemize}
 
+\todo{Valor-F no utilitzat!!!. RI i MI s'utilitza els coeficients ajustats.}
 
             S'ha seleccionat una mètrica de cada família, respectivament:
             el valor-F,
@@ -1007,61 +1044,501 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                 i al clúster $j$.
 
 
-    \section{Software}
+    \section{Conjunts de dades}
+    \label{s:dades}
+
+    Per comparar els resultats dels diferents mètodes de \textit{clustering}
+    s'han utilitzat tres conjunts de dades,
+    dos d'accés públic i un privat.
+
+    \paragraph{\acrshort{mnist}}
+        El conjunt de dades \gls{mnist} \citep{Deng2012}
+        és un conjunt de dades freqüentment utilitzat
+        per l'entrenament de models de \textit{machine learning},
+        especialment amb els relacionats amb el reconeixement o processat d'imatges.
+
+        Es tracta d'un conjunt de 70.000 imatges
+        de dígits escrits a mà,
+        etiquetades en funció del dígit que representen.
+        Cada imatge té una resolució de 28 x 28 píxels.
+        En aquest \gls{tfm}, s'ha tractat cada imatge com una observació
+        i els 784 píxels com 784 variables independents.
+
+    \paragraph{Exposome Data Challenge Event}
+        Es tracta de diversos conjunts de dades
+        provinents d'un concurs anomenat \textit{Exposome Data Challenge Event} \citep{Maitre2022},
+        que va tenir lloc a l'abril de 2021.
+        En aquest concurs es van presentar una sèrie de conjunts de dades
+        metabolòmiques, proteòmiques, de metilació del ADN i d'exposició ambiental
+        observades en nens entre 6 i 11 anys,
+        a més de dades fenotípiques
+        i de covariables o possibles factors de confusió.
+
+        L'objectiu del concurs era que els competidors
+        presentessin formes innovadores d'analitzar les dades
+        i trobar relacions rellevants en l'àmbit de la salut.
+
+        S'han seleccionat dos conjunts de dades
+        sobre els que comparar les diferents tècniques de \textit{clustering}:
+
+        \begin{itemize}
+            \item Dades metabolòmiques, formades per dos conjunts de dades,
+            extretes de mostres de sèrum (177 metabolits) i orina (44 metabolits),
+            formant un total de 221 variables.
+
+            \item Dades d'exposició ambiental o exposoma,
+            compostes per 222 indicadors d'exposició
+            relacionats amb l'exposició a factors ambientals
+            (contaminació de l'aire, soroll),
+            l'exposició a productes químics
+            (metalls, pesticides)
+            i l'estil de vida dels individus
+            (dieta, consum de tabac).
+        \end{itemize}
+
+        Per mesurar les mètriques de validació externa,
+        s'han seleccionat algunes variables fenotípiques i de les covariables
+        que s'han trobat que poden ser descriptives.
+
+        En tots els casos,
+        s'ha seleccionat només aquelles observacions
+        que contenen dades a tots els conjunts de dades.
+        En total, es disposa de 1152 observacions.
+
+    \paragraph{Dades metabolòmiques privades}
+        En tercer lloc, s'ha utilitzat un conjunt de dades metabolòmiques
+        facilitat per un equip privat,
+        provinents d'un estudi clínic
+        on es pretén relacionar les expressions metabolòmiques
+        amb diversos indicadors de salut.
+
+        Es tracta d'un conjunt de 1120 observacions
+        sobre 411 metabolits
+        obtingudes en tres moments diferents sobre els mateixos pacients,
+        acompanyades de 16 covariables
+        de les cuals dues són categòriques
+        (gènere, índex de risc d'enfermetats cardiovasculars)
+        i la resta numèriques
+        (edat i diversos indicadors de salut).
+
+        L'entitat que ha proveït les dades
+        ha anonimitzat la identitat dels pacients
+        i no permet la publicació de les dades
+        per protegir la seva confidencialitat.
+
+\todo{Referenciar font dades privades.}
+
+
+
+    \section{Metodologia}
+    \label{s:metodologia}
+
+    A continuació es descriu la metodologia que s'ha seguit
+    per avaluar els diferents mètodes de \textit{clustering}
+    utilitzant els tres conjunts de dades estudiats.
+
+    Tot el codi utilitzat per implementar els models de \textit{deep clustering}
+    i per dur a terme la metodologia que s'explica a continuació
+    s'ha fet públic a un repositori a GitHub:
+    \url{https://github.com/carlescn/MSc_bioinformatics_thesis}.
+
+        \subsection{\acrshort{mnist}}
+        \label{s:mnist}
+
+        El conjunt de dades \gls{mnist}
+        s'ha seleccionat per ser un exemple molt estudiat
+        i sobre el que es coneix que
+        es poden aconseguir bons resultats de \textit{clustering}
+        amb diferents mètodes, clàssics i basats en \textit{deep learning}.
+
+        S'ha utilitzat com a marc de referència
+        per validar la funcionalitat
+        dels diferents models de \textit{deep clustering} implementats,
+        i seleccionar aquells que funcionin millor.
+
+        \paragraph{Mètodes clàssics}
+            Primerament,
+            s'han aplicat tècniques de \textit{clustering} clàssiques
+            (\gls{kmeans}, \gls{gmm})
+            sobre les dades brutes
+            i s'han mesurat les mètriques de \gls{cq}.
+
+            Seguidament s'ha aplicat \gls{pca}
+            i s'han seleccionat les primeres components principals
+            que expliquen el 80\% de la variància.
+            S'han repetit les tècniques clàssiques
+            i s'han mesurat les mètriques.
+            Aquestes mètriques s'han pres com a mesura de referència
+            contra la que comparar el rendiment de les tècniques de \textit{deep clustering}.
+
+        \paragraph{Mètodes de \textit{deep clustering}}
+            A continuació,
+            s'han aplicat diverses tècniques de \textit{deep clustering}
+            en ordre de menor a major complexitat.
+            En tots els casos s'ha utilitzat
+            el mateix subcojunt de 60.000 imatges per entrenar el model
+            i les 10.000 restants per avaluar el seu rendiment.
+            Per adaptar les dades a un format que els models de \textit{deep learning} puguin tractar,
+            s'han normalitzat aplicant la funció \textit{min-max}
+            per acotar tots els valors dins d'un rang entre 0 i 1.
+
+            Per tots els models s'ha utilitzat la mateixa configuració
+            del \gls{ae} que forma la base del model:
+            un codificador i descodificador simètrics
+            basats en \gls{mlp},
+            formats per tres capes ocultes amb 512, 512 i 2048 neurones respectivament.
+            El número de neurones de la capa latent s'ha fixat al número de clústers.
+            Totes les neurones tenen funció d'activació \gls{relu},
+            excepte les capes d'entrada (sense funció d'activació)
+            i sortida (codificador: sense activació, descodificador: funció d'activació sigmoide).
+
+            Primer
+            s'ha entrenat un \gls{ae} amb les dades d'entrenament i
+            s'han codificat les dades de validació amb el model resultant.
+            Seguidament s'ha aplicat \gls{kmeans} i \gls{gmm}
+            sobre les dades transformades.
+            S'ha repetit el mateix procés substituint el \gls{ae} per un \gls{vae}.
+
+            En segon lloc
+            s'ha entrenat i avaluat un model \gls{dec},
+            inicialitzant els paràmetres del model
+            primer amb els centroides trobats per \gls{kmeans}
+            i després pels trobats amb \gls{gmm}.
+            S'han mesurat les mètriques pels dos resultats.
+
+            En tercer lloc
+            s'ha entrenat i avaluat un model mixt VAE+DEC, que implementa
+            un mòdul de \textit{clustering} de l'arquitectura \gls{dec},
+            sobre la base d'un \gls{vae}.
+            Els paràmetres del mòdul \gls{dec} s'han inicialitzat amb \gls{kmeans} i amb \gls{gmm}.
+
+            Per últim
+            s'ha entrenat i avaluat un model \gls{vade},
+            inicialitzant els paràmetres amb \gls{gmm}.
+
+        \paragraph{Avaluació dels mètodes}
+
+            Finalment,
+            s'han comparat totes les mètriques
+            i s'han seleccionat aquells models de \textit{deep learning}
+            que mostren un bon rendiment en relació amb la seva complexitat:
+            \gls{dec} i \gls{vade}.
+
+            En tots els casos,
+            els models s'han avaluat fixant el nombre de clústers a 10,
+            que és el nombre de classes reals de les dades.
+            No s'ha evaluat els resultats amb diferents nombres de clústers.
+
+
+        \subsection{Exposome Data Challenge Event}
+        \label{s:exposome}
+
+        Amb aquest conjunt de dades s'han comparat
+        tres tècniques de \textit{clustering} clàssiques
+        amb els dos models de \textit{deep clustering}
+        seleccionats al pas anterior.
+        Donat que en aquest cas sí es tracta de dades metabolòmiques,
+        s'espera que el resultat sigui extrapolable
+        a altres conjunts de dades del mateix tipus.
+
+        S'han seleccionat 11 variables independents
+        (veure \cref{t:exposome_vars}),
+        que s'han utilitzat com a classes objectiu
+        contra les que s'ha calculat les mètriques de validació externa.
+        S'espera que la distribució dels clústers trobats
+        s'aproximi a alguna d'aquestes variables.
+
+        \begin{table}[h]
+            \small
+            \centering
+            \begin{tabular}{ |c c c l| }
+                \hline
+                Conjunt de dades & Nom           & Núm. grups & Descripció \\
+                \hline
+                Fenotip          & birth\_weight & 4*         & Pes al néixer. \\
+                Fenotip          & iq            & 4*         & Quocient d'intel·ligència. \\
+                Fenotip          & behaviour     & 4*         & Comportament neurològic (índex). \\
+                Fenotip          & asthma        & 2          & Incidència d'asma. \\
+                Fenotip          & bmi           & 4*         & Índex de massa corporal. \\
+                Covariables      & cohort        & 6          & Cohort d'inclusió a l'estudi. \\
+                Covariables      & age           & 7          & Edat en anys. \\
+                Covariables      & sex           & 2          & Gènere. \\
+                Covariables      & education     & 3          & Nivell d'estudis de la mare. \\
+                Covariables      & native        & 3          & Pares natius del país de naixement. \\
+                Covariables      & parity        & 3          & Nombre d'embarassos previs (mare). \\
+                \hline
+            \end{tabular}
+            \caption{Variables independents seleccionades del conjunt de dades Exposome Data Challenge Event.
+                \newline
+                * variables numèriques contínues. Convertides en 4 grups mitjançant quantils.}
+            \label{t:exposome_vars}
+        \end{table}
+
+        En un primer pas
+        s'ha buscat una configuració òptima del \gls{ae}
+        que formarà la base dels models de \textit{deep clustering}.
+        Donat que el conjunt de dades és relativament petit
+        (1.152 observacions en 221 variables)
+        s'han provat diverses configuracions
+        fins aconseguir reduir al màxim el número de paràmetres entrenables de la xarxa,
+        sense afectar negativament a la puntuació de la funció de cost.
+        El model resultant conté tres capes internes amb 16, 16 i 128 neurones respectivament.
+        Igual que en la secció anterior,
+        totes les neurones tenen funció d'activació \gls{relu},
+        excepte les capes d'entrada i sortida i les capes latents.
+
+        A continuació, s'han avaluat diversos mètodes de \textit{clustering}
+        clàssics i bastats en \textit{deep learning}.
+        A la \cref{t:exposome_tecniques} es mostra un resum de les tècniques utilitzades.
+
+
+        \paragraph{Dades metabolòmiques}
+            S'han avaluat els diversos models de \textit{clustering}
+            sobre el conjunts de dades metabolòmiques.
+            Donat que les dades metabolòmiques en orina contenen un número reduït de variables,
+            s'ha optat per unir-las a les dades metabolòmiques en sèrum
+            obtenint així un únic conjunt de dades metabolòmiques.
+            Previ al seu estudi, les dades s'han normalitzat amb la funció \textit{min-max}
+            per acotar tots els valors dins d'un rang entre 0 i 1.
+
+            Primer
+            s'han aplicat tècniques de \textit{clustering} clàssiques
+            (\gls{kmeans}, \gls{gmm}, \gls{aglo})
+            sobre les dades brutes
+            i sobre la transformació \gls{pca}
+            (seleccionant les components principals que expliquen el 80\% de la variància).
+            A continuació s'ha entrenat i avaluat
+            els dos models de \textit{deep clustering} seleccionats
+            (\gls{dec}, \gls{vade}).
+            Motivat pels resultats poc prometedors obtinguts,
+            s'han provat diverses aproximacions addicionals.
+
+            En primer lloc s'han seleccionat les variables amb major variància,
+            calculant la variància per cada un dels metabòlits en sèrum
+            i seleccionant aquells que presenten una variància superior a la mitjana de les variàncies.
+            El mateix procés s'ha repetit pels metabòlits en orina,
+            i finalment s'han tornat a unir els dos conjunts en un de sol
+            A continuació s'han avaluat els mateixos mètodes clàssics
+            i basats en \textit{deep learning}.
+
+            Donat que els resultats inicials no han semblat molt prometedors,
+            s'ha intentat millorar la relació entre la mida de les dades
+            i el nombre de paràmetres de dues maneres:
+
+            \begin{itemize}
+                \item Augmentar artificialment el nombre de dades.
+                S'han generat mostres aleatòries d'una distribució normal
+                amb mitjana 0 i desviació estàndard 0.01
+                (un ordre de magnitud inferior inferior a la mitjana de les dades).
+
+                A continuació s'han sumat aquestes mostres als valors de les dades originals.
+                S'ha repetit el procés 10 vegades per obtenir un conjunt de dades
+                amb 11.520 observacions,
+                que presenten una distribució similar a les dades originals.
+
+                Amb aquestes dades, s'han entrenat i avaluat els dos models de \textit{deep clustering.}
+
+                \item Reduir el nombre de paràmetres entrenables de la xarxa neuronal.
+                S'han implementat nous models \gls{dec} i \gls{vade},
+                substituint les capes internes del tipus \gls{mlp}
+                per capes convolucionals.
+                Això permet reduir dràsticament el nombre de paràmetres del model,
+                però assumeix que les dades presenten algun tipus d'estructura invariable.
+
+                Primerament s'han entrenat i avaluat els dos models
+                amb capes convolucionals d'una dimensió.
+                A continuació s'ha fet el mateix amb capes convolucionals de dues dimensions,
+                pel que ha sigut necessari dotar a les dades d'una estructura bidimensional artificial:
+                s'han convertit els vectors de 221 valors de cada observació
+                en matrius bidimensional de mida 16 x 16,
+                afegint zeros a les posicions de la matriu que han quedat buides.
+
+                Per cada una de les dues configuracions (1D, 2D),
+                s'han implementat diversos models \gls{ae}
+                amb diferents combinacions de mida del kernel,
+                número de capes i
+                número de neurones per capa,
+                i s'ha seleccionat la combinació que aconsegueix
+                una bona puntuació per la funció de cost
+                amb el menor número de paràmetres:
+                \begin{itemize}
+                    \item 1D: capes internes: 1 (4 neurones), mida del kernel: 3.
+                    \item 2D: capes internes: 2 (4 i 4 neurones), mida del kernel: 3.
+                \end{itemize}
+
+                Finalment, s'han entrenat i avaluat els models \gls{dec} i \gls{vade}
+                per cada una de les dues configuracions.
+            \end{itemize}
+
+        \paragraph{Dades de l'exposoma}
+            A continuació
+            s'han avaluat les tècniques clàssiques (\gls{kmeans}, \gls{gmm}, \gls{aglo})
+            i els models de \textit{deep learning} \gls{dec} i \gls{vade}
+            (basats en \gls{mlp}).
+            En aquestes dades no s'ha aplicat tècniques d'augment de dades
+            ni models amb capes convolucionals.
+
+            Els resultats obtinguts
+            suggereixen la presència d'un fort efecte de lot,
+            ja que totes les tècniques aconsegueixen un solapament gairebé perfecte
+            amb els grups de la variable \textit{cohort}.
+
+            Finalment,
+            s'ha decidit aplicar una correcció per aquest efecte lot als dos conjunts de dades,
+            separant les observacions pels grups de la variable \textit{cohort}
+            restant la mitjana de cada grup i dividint per la seva desviació típica.
+            Finalment, s'han tornat a unir les dades en l'ordre original
+            i s'han normalitzat amb la funció \textit{min-max},
+            abans de tornar a avaluar els mateixos cinc mètodes de clustering
+            (\gls{kmeans}, \gls{gmm}, \gls{aglo}, \gls{dec} i \gls{vade}).
+
+        \paragraph{Avaluació dels models}
+
+            Per cada base de dades i mètode (amb les seves variacions),
+            s'ha avaluat els resultats per un rang de clústers 2, 3, 4, 6 i 7,
+            que coincideixen amb les classes de les variables categòriques seleccionades.
+
+            A més de compilar les mètriques de tots els mètodes avaluats,
+            s'ha estudiat de manera gràfica
+            una possible interpretació dels clústers resultants dels diferents models.
+
+            Per una banda,
+            s'ha dibuixat, per cada mètode i número de clústers,
+            una gràfica radial que representa la distribució multivariant
+            dels conjunts de dades fenotípiques i covariables
+            per cada un dels clústers.
+
+            Per una altra banda,
+            s'ha seleccionat les 20 variables amb més variabilitat de cada conjunt de dades
+            (metabolòmiques, exposoma)
+            i s'ha representat la seva distribució multivariant
+            per cada un dels clústers de la mateixa manera.
+
+            Finalment,
+            S'han comparat entre elles les assignacions de clústers de cada un dels mètodes
+            mitjançant un gràfic tipus \textit{heatmap},
+            on cada fila representa una de les tècniques avaluades,
+            les columnes representen les observacions del dataset,
+            i el color representa l'assignació de cada mostra a un dels clústers.
+
+\todo{Incloure referències als gràfics en els resultats o annexos.}
+
+
+            \begin{table}[]
+                \small
+                \centering
+                \begin{tabular}{|cccc|}
+                    \hline
+                    Conjunt de dades &
+                    \multicolumn{2}{c}{Mètode} &
+                    Variacions \\ \hline
+                    \multirow{2}{*}{Metaboloma} &
+                    Clàssic &
+                    \begin{tabular}[c]{@{}c@{}}K-means\\ GMM\\ Aglo.\end{tabular} &
+                    \begin{tabular}[c]{@{}c@{}}PCA\\ Selecció de variables\\ Correcció efecte lot\end{tabular} \\
+                    &
+                    Deep learning &
+                    \begin{tabular}[c]{@{}c@{}}DEC\\ VaDE\end{tabular} &
+                    \begin{tabular}[c]{@{}c@{}}Selecció de variables,\\ Augment de dades,\\ MPL / Conv.\\ Correcció efecte lot\end{tabular} \\ \hline
+                    \multirow{2}{*}{Exposoma} &
+                    Clàssic &
+                    \begin{tabular}[c]{@{}c@{}}K-means\\ GMM\\ Aglo.\end{tabular} &
+                    Correcció efecte lot \\
+                    &
+                    Deep learning &
+                    \begin{tabular}[c]{@{}c@{}}DEC\\ VaDE\end{tabular} &
+                    \begin{tabular}[c]{@{}c@{}}MPL\\ Correcció efecte lot\end{tabular} \\ \hline
+                \end{tabular}
+                \caption{Resum de les tècniques de \textit{clustering} utilitzades
+                    en el conjunt de dades \textit{Exposome Data Challenge Event}}
+                \label{t:exposome_tecniques}
+            \end{table}
+
+        \subsection{Dades metabolòmiques privades}
+        \label{s:dades_privades}
+
+        Aquest és l'últim conjunt de dades que s'ha estudiat.
+        S'ha seguit la mateixa metodologia bàsica que en el cas anterior.
+
+        Inicialment s'han provat diverses configuracions
+        del \gls{ae} base i s'ha escollit un model amb dues capes internes tipus \gls{mlp}
+        amb 16 i 32 neurones respectivament.
+        Igual que en els casos anteriors,
+        totes les neurones tenen funció d'activació \gls{relu}
+        excepte les capes d'entrada, sortida i latents.
+
+        Com a grups objectiu contra els que avaluar les mètriques,
+        s'han seleccionat dues variables categòriques de les covariables
+        que s'ha trobat mostren una distribució diferencial per la resta de covariables
+        (indicadors biològics relacionats amb la salut):
+        \textit{gender}, que té dos classes
+        i codifica el gènere de l'individu,
+        i \textit{CVrisk3}, que té tres classes
+        i codifica un índex de risk de patir malalties cardiovasculars.
+
+        Igual que en el cas anterior,
+        les dades metabolòmiques s'han normalitzat amb la funció \textit{min-max}
+        per acotar tots els valors dins d'un rang entre 0 i 1.
+
+        A continuació s'han avaluat els mètodes de \textit{clustering} clàssics
+        (\gls{kmeans}, \gls{gmm}, \gls{aglo})
+        sobre les dades originals
+        i la transformació \gls{pca},
+        i s'han entrenat i avaluat els dos mètodes de \textit{deep clustering}
+        (\gls{dec}, \gls{vade}).
+        Tots els mètodes s'han avaluat fixant el número de clústers a 2 i 3.
+
+        Finalment,
+        s'ha compilat les mètriques obtingudes pels diferents mètodes
+        i s'ha estudiat de manera gràfica
+        una possible interpretació dels clústers
+        utilitzant gràfiques radials.
+
+        S'ha representat la distribució multivariant de totes les covariants
+        per cada un dels mètodes i pels dos números de clústers.
+        S'han seleccionat els 20 metabolits que presenten més variabilitat
+        i s'ha representat també la seva distribució multivariant.
+
+        Finalment,
+        S'han comparat les assignacions de clústers de cada un dels mètodes
+        mitjançant un gràfic tipus \textit{heatmap},
+        on cada fila representa una de les tècniques avaluades,
+        les columnes representen les observacions del dataset,
+        i el color representa l'assignació de cada mostra a un dels clústers.
+
+
+    \section{Eines informàtiques}
     \label{s:software}
 
-        \paragraph{Eina per desenvolupar xarxes neuronals.}
+        \paragraph{Software}
+            Els models de \textit{deep clustering}
+            s'han implementat utilitzant el software Keras \citep{Chollet2015},
+            una eina basada en TensorFlow \citep{Ghemawat2016}
+            que es va desenvolupar per l'àmbit de la recerca.
+            Permet definir i entrenar models de xarxes neuronals profunds
+            de manera relativament senzilla,
+            però alhora possibilita interactuar a més baix nivell amb TensorFlow
+            per realitzar operacions més complexes \citep{Ketkar2021}.
 
-            Per la realització d'aquest estudi es necessitarà desenvolupar models de xarxes neuronals complexos. Les eines més utilitzades actualment per treballar amb xarxes neuronals son TensorFlow, Keras i PyTorch \citep{Kaggle2021}.
-
-            Keras \citep{Chollet2015} és una eina basada en TensorFlow \citep{Ghemawat2016} que es va desenvolupar per l'àmbit de la recerca. Permet definir i entrenar models de xarxes neuronals profunds de manera relativament senzilla, però alhora possibilita interactuar a més baix nivell amb TensorFlow per realitzar operacions més complexes \citep{Ketkar2021}.
-
-            S'ha decidit treballar amb aquest eina donada la seva popularitat en l'àmbit de la recerca, i el fet que l'autor ja està familiaritzat a un nivell bàsic amb aquesta eina donat que s'ha utilitzat en l'assignatura M0.163 - Machine Learning del màster.
-
-        \paragraph{Llenguatge de programació.}
-
-            Les tècniques de \textit{clustering}, tant mitjançant mètodes de \textit{deep learning} com clàssics, podrien aplicar-se utilitzant una gran varietat de llenguatges de programació. En l'àmbit de la recerca són àmpliament utilitzats els llenguatges \textsf{R} \citep{RCoreTeam2017} y Python \citep{VanRossum2009} \citep{Kaggle2021}, donada la facilitat de compartir i replicar codi que aporta emmarcar-lo en llenguatge Markdown mitjançant documents R Markdown \citep{Xie2016} o llibretes Jupyter Notebook \citep{Kluyver2016}.
-
-            Per realitzar els estudis de \textit{clustering} utilitzant tècniques clàssiques s'escull el llenguatge \textsf{R} i l'entorn de desenvolupament \textsf{R} Studio \citep{RStudioTeam2020}, donada la familiaritat adquirida amb aquest llenguatge i entorn en diverses assignatures del màster.
-
-            Encara que existeix una llibreria que permet utilitzar Keras dins de l'entorn de \textsf{R}, el seu us és limitat donat que l'eina està desenvolupada en Python. En el seu llenguatge natiu és possible utilitzar Keras per realitzar tasques més complexes, com desenvolupar models més complexos i ajustar els mètodes d'entrenament o mesures del rendiment. S'escull per tant el llenguatge Python per realitzar els estudis de \textit{deep clustering}.
+            Pràcticament la totalitat de l'estudi
+            s'ha realitzat mitjançant el llenguatge de programació Python \citep{VanRossum2009},
+            documentat en llibretes Jupyter Notebook \citep{Kluyver2016}.
+            Com s'ha mencionat al inici de la secció,
+            tot el codi està disponible a un repositori a GitHub.
 
         \paragraph{Hardware i serveis de computació \textit{on-line}.}
 
-            Encara que l'estudi amb mètodes clàssics utilitzant \textsf{R} es pot realitzar de manera local en un ordinador de sobretaula relativament modern, l'entrenament i execució dels models de \textit{deep learning} com els que s'utilitzaran en aquest estudi requereixen un hardware més potent del que es disposa. S'optarà per tant per l'ús de plataformes de computació \textit{on-line} àmpliament utilitzades tant per estudiants com en l'àmbit de la recerca: Google Colab\footnote{\url{https://research.google.com/colaboratory/faq.html}} i/o Paperspace Gradient\footnote{\url{https://docs.paperspace.com/gradient/}}.
+            L'equip informàtic del que disposa l'estudiant,
+            si bé té capacitat per executar les tècniques de \textit{clustering} clàssiques,
+            presenta limitacions a l'hora d'entrenar models
+            basats en xarxes neuronals profundes,
+            que consumeixen una gran quantitat de memòria RAM
+            i requereixen de GPUs potents per una execució més o menys àgil.
 
-            Com a valor afegir, la utilització d'aquests serveis facilitarà l'ús del software necessari, ja que posen a disposició un entorn Python amb gran varietat de llibreries preinstal·lades, com per exemple les necessàries per utilitzar Keras. Això elimina els possibles problemes o incompatibilitats que es podrien trobar al instal·lar tot el software necessari i facilita treballar amb les versions més recents.
-
-            Ambdues plataformes ofereixen un model de subscripció gratuïta així com diferents plans de pagament. El model gratuït es considera insuficient en ambdós casos ja que no garanteix la disponibilitat de màquines virtuals en qualsevol moment, i això podria obstaculitzar el progrés del treball. El pla de pagament més econòmic d'ambdues plataformes té un preu similar i a priori es considera suficient per realitzar aquest estudi.
-
-            Al comparar detalladament les característiques que ofereix cada servei, s'observa que Paperspace Gradient ofereix algunes característiques desitjables que no ofereix Google Colab: 15 GB d'emmagatzematge permanent, la opció de treballar amb una IDE completa de JupyterLab, i l'accés garantit a màquines amb característiques específiques. Per contra, cap pla de pagament de Google Colab garanteix la disponibilitat de màquines en qualsevol moment o les seves característiques.
-
-            Per aquests motius, es decideix que es treballarà amb la plataforma Paperspace Gradient. S'estima que es necessitarà una subscripció durant els mesos de novembre i desembre, el que suposarà un cost econòmic de \$16.00 (equivalent a 16.44€ en el moment de la redacció d'aquest informe).
-
-    \section{Més coses}
-    \label{s:mes}
-
-    Aquest TFM es divideix en dues parts ben diferenciades. A la primera part, emmarcada per l'objectiu 1.1 definit a la \cref{s:objectius}, es pretén consolidar una base sòlida de coneixements i habilitats específics que es posaran en pràctica a la segona part, que engloba els objectius 1.2 i 1.3.
-
-    Es realitzarà una recerca bibliogràfica per tal de contextualitzar el problema a resoldre. Es caracteritzaran les tècniques de \textit{clustering} utilitzades en dades metabolòmiques i com s'utilitzen les tècniques de \textit{deep learning} en aquest camp.
-
-    S'estudiarà amb profunditat l'arquitectura dels variational autoencoders i com es poden aplicar per realitzar tècniques \textit{clustering}. Finalment, s'estudiarà el funcionament de la llibreria Keras per desenvolupar xarxes neuronals. Per familiaritzar-se millor amb aquesta eina, es practicarà replicant exemples de codi ja desenvolupats. L'estudi es basarà en el manual \textit{Deep Learning with Python} \citep{Ketkar2021}.
-
-    Per obtenir les dades metabolòmiques que s'utilitzaran per desenvolupar el model es contactarà amb un grup de treball de la Universitat de Barcelona associat amb el tutor d'aquest TFM.
-
-    Per tal d'establir un marc de referència contra el que comparar el model que es desenvoluparà, es realitzarà un estudi de \textit{clustering} preliminar utilitzant algunes tècniques clàssiques consolidades.
-
-    A continuació es durà a terme la part central del TFM: el desenvolupament d'un model de \textit{deep clustering} utilitzant una arquitectura de \textit{variational autoencoder}. Durant el desenvolupament es provaran diverses configuracions de xarxes neuronals, hiperparàmetres i mètodes d'entrenament per buscar una solució òptima. Un cop desenvolupat el model, es compararan els resultats obtinguts amb el marc de referencia.
-
-    Finalment s'aplicarà el model sobre un conjunt de dades metabolòmiques procedents d'un estudi clínic i s'estudiarà la interpretabilitat del resultats. S'espera que el model tingui poder predictiu, és a dir que existeixi una relació entre els clústers generats i els grups reals definits a les dades.
-
-    \paragraph{Conjunt de dades.}
-
-        Els models de \textit{deep learning} requereixen una bona quantitat de dades per realitzar el seu entrenament. Aquestes dades es podrien obtenir d'algun repositori de bases de dades d'accés lliure, per exemple Gene Expression Omnibus de NCBI\footnote{\url{https://www.ncbi.nlm.nih.gov/gds}} o MetaboLights de EMBL-EBI\footnote{\url{https://www.ebi.ac.uk/metabolights/}}. No obstant, amb l'ànim de realitzar un estudi fresc es prefereix treballar amb dades no publicades, sempre que sigui possible.
-
-        Es contactarà amb un grup de treball de la Universitat de Barcelona associat amb el tutor d'aquest TFM, que està realitzant un estudi relacionat amb dades metabolòmiques, per sol·licitar l'accés a les seves dades.
-
-        En cas de no aconseguir-se per aquest mètode, s'intentarà contactar amb altres grups de treball relacionats amb dades òmiques per intentar aconseguir un conjunt dades adequada. Com a darrera opció, es cercarà una base de dades d'accés lliure que sigui adequada per realitzar aquest estudi.
+            Per aquest motiu,
+            ha sigut imprescindible utilitzar un servei de computació \textit{on-line}.
+            Concretament, s'ha utilitzat el servei de pagament Paperspace Gradient\footnote{\url{https://docs.paperspace.com/gradient/}}.
+            A la \cref{s:economica} es desglossa el cost d'aquest servei.
 
 
 
@@ -1081,11 +1558,42 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     %Aquesta part pot ser que no apliqui segons el tipus de treball.
 
 \chapter{Valoració econòmica}
+\label{s:economica}
     %En cas que correspongui, s'inclourà un apartat de ``Valoració econòmica del treball". Aquest apartat indicarà les despeses associades al desenvolupament i manteniment del treball, així com els beneficis econòmics obtinguts. Cal fer una anàlisi final sobre la viabilitat del producte.
+
+    La realització d'aquest \gls{tfm} ha requerit d'una única despesa econòmica:
+    una subscripció Paperspace Gradient,
+    el servei de computació \textit{on-line}
+    que es menciona a la \cref{s:software}.
+
+    Encara que aquesta plataforma ofereix un servei gratuït,
+    s'ha considerat insuficient
+    ja que no garanteix la disponibilitat de màquines virtuals en qualsevol moment.
+
+    S'ha subscrit el pla de pagament més econòmic,
+    que ha cobert els requisits de poder de computació
+    i disponibilitat.
+    La subscripció ha tingut un cost de \$8 al mes
+    i s'ha activat durant els mesos de novembre, desembre i generdurant,
+    sumant per tant un total de \$24
+    (equivalent a aproximadament 22 € en el moment de redactar aquest informe).
+
+    Aquest servei només ha sigut necessari
+    ja que no es disposa d'una màquina prou potent
+    per entrenar els models neuronals que s'han implementat.
+
+    Donat que el cost mensual d'aquest servei és petit,
+    que no és estrictament necessari
+    si es disposa d'una màquina suficientment potent,
+    i que l'objectiu no ha sigut desenvolupar un producte econòmicament sostenible,
+    si no implementar i avaluar una sèrie de models prototip,
+    es considera que el cost ha sigut perfectament assumible.
+
 
 \chapter{Conclusions i treballs futurs}
 
     \section{Conclusions}
+    \label{s:conclusions}
         %Aquest capítol ha d'incloure:
         %\begin{itemize}
         %    \item Una descripció de les conclusions del treball:
@@ -1101,9 +1609,11 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
 
     \section{Línies de futur}
+    \label{s:futur}
         %Les línies de treball futur que no s'han pogut explorar en aquest treball i han quedat pendents.
 
     \section{Seguiment de la planificació}
+    \label{s:planificacio}
         %\begin{itemize}
         %    \item Una anàlisi crítica del seguiment de la planificació i metodologia al llarg del producte:
         %    \begin{itemize}
@@ -1118,7 +1628,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 \chapter{Glossari i abreviacions}
     %Definició dels termes i acrònims més rellevants utilitzats dins la Memòria.
 
-    \section{Glossari}
+%    \section{Glossari}
 
     %Abreviacions:
     \printglossary[type=\acronymtype, title={Abreviacions}]
