@@ -6,7 +6,7 @@
 
     %Load packages
         %Modifies ToC: include References, remove LoF, LoT
-        \usepackage[nottoc, notlof, notlot, numbib]{tocbibind}
+        \usepackage[nottoc, notlof, notlot]{tocbibind}
 
 %        %Insert page number in reference
 %        \usepackage{varioref}
@@ -20,7 +20,7 @@
         }
 
         %Use acronyms
-        \usepackage[acronym,nomain,section=section,numberedsection=autolabel]{glossaries}
+        \usepackage[acronym,nomain,toc,section=chapter]{glossaries}
             % Make glossary links black
             \renewcommand*{\glstextformat}[1]{\textcolor{black}{#1}}
             % Generate the glossary
@@ -91,11 +91,14 @@
         \usepackage{rotating}
 
 %        %Insert landscape page
-%        \usepackage{lscape}
+        \usepackage{lscape}
 
         % Nice tables with merged rows/columns
         \usepackage{multirow}
         \usepackage{booktabs}
+
+        % Tables that span multiple pages
+        \usepackage{longtable}
 
 
 
@@ -109,7 +112,7 @@
 %}End Carles customization
 
 %Introducció de dades del treball
-\title{Implemenació de models de \textit{deep clustering} en dades metabolòmiques.}
+\title{Implementació de models de \textit{deep clustering} en dades metabolòmiques.}
 \titcrt{\textit{Deep clustering} en dades metabolòmiques} %Títol curt que apareixerà a la capçalera
 \author{Carles Criado Ninà}
 \date{15 de gener de 2023}
@@ -167,8 +170,6 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 \todo{ESCRIURE ABSTRACT!
 
     REFERÈNCIA DADES PRIVADES!!!
-
-    Actualitzar tot segons estat final del projecte (aprofitar informes PAC2 i 3).
 }
 
     \section{Context i justificació del treball}
@@ -287,7 +288,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
             Per tant, s’ha considerat que l’impacte ambiental ha estat mínim.
 
             Per entrenar els models s'ha utilitzat un servei de computació on-line.
-            Només es coneixen dues alternatives viables:
+            Només s'han considerat dues alternatives viables:
             Paperspace Gradient\footnote{\url{https://docs.paperspace.com/gradient/}}
             o Google Colab\footnote{\url{https://research.google.com/colaboratory/faq.html}}.
             Entre els criteris utilitzats per seleccionar un dels dos serveis
@@ -463,18 +464,56 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     \section{Breu descripció dels altres capítols de la memòria}
         %Breu explicació dels continguts de cada capítol i la seva relació amb el projecte global.
 
-\todo{Descriure els capítols:
-\begin{itemize}
-    \item Estat de l'art
-    \item Materials i mètodes
-    \item Resultats
-    \item Discussió
-    \item Valoració econòmica
-    \item Conclusions i treballs futurs
-\end{itemize}}
+    \paragraph{\Cref{c:state} \nameref{c:state}}
+        En aquest primer capítol
+        s'esmenten breument les característiques de les dades metabolòmiques
+        i s'introdueixen les tècniques de \textit{clustering} clàssiques,
+        el concepte d'\gls{fl},
+        i les avantatges que poden suposar els models basats en xarxes neuronals profundes.
+
+    \paragraph{\Cref{c:metodes} \nameref{c:metodes}}
+        Aquí es presenta la base teòrica que sosté
+        els models de \textit{deep clustering} escollits,
+        així com algunes particularitats de la seva implementació.
+        A continuació es detallen les mètriques
+        utilitzades per avaluar el seu rendiment.
+
+        Tot seguit
+        es presenten els conjunts de dades utilitzats
+        i s'explica detingudament la metodologia seguida
+        per avaluar i comparar els diversos models.
+
+        Finalment,
+        es mencionen breument les eines informàtiques utilitzades
+        per implementar els models de \textit{deep clustering}
+        i avaluar els resultats.
+
+    \paragraph{\Cref{c:resultats} \nameref{c:resultats}}
+        A continuació
+        es presenten els resultats obtinguts
+        i se'n fa un breu resum.
+        La totalitat dels resultats
+        es presenten en taules i figures als corresponents annexos.
+
+\todo{Revisar si això és correcte. Referenciar annexos corresponents.}
+
+    \paragraph{\Cref{c:discussio} \nameref{c:discussio}}
+\ \newline
+\todo{Resumir la discussió...}
+
+    \paragraph{\Cref{c:economic} \nameref{c:economic}}
+        En aquest capítol es resumeix breument
+        el petit cost econòmic que ha suposat
+        el desenvolupament d'aquest \gls{tfm}.
+
+    \paragraph{\Cref{c:conclusions} \nameref{c:conclusions}}
+\ \newline
+\todo{Resumir les conclusions...}
+
+    \glsunset{fl}
 
 \chapter{Estat de l'art}
-\label{s:state}
+\label{c:state}
     %Estat de l'art del tema en qüestió.
     %Hauria d'acabar mostrant per què el treball és important i aporta alguna cosa, i amb les hipòtesis del treball.
 
@@ -490,7 +529,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     \section{Tècniques de \textit{clustering}}
     \label{s:state_cluster}
 
-        Les tècniques de \textit{clustering} són un conjunt de tècniques d'aprenentatge automàtic no supervisat que es basen en agrupar les observacions en funció d'alguna mesura de la seva similitud, sense coneixement previ de l'estructura de les observacions o el nombre de grups que es pretén obtenir.
+        Les tècniques de \textit{clustering} són un conjunt de tècniques estadístiques o d'aprenentatge automàtic no supervisat que es basen en agrupar les observacions en funció d'alguna mesura de la seva similitud, sense coneixement previ de l'estructura de les observacions o el nombre de grups que es pretén obtenir.
 
         L'objectiu d'aquestes tècniques és separar les dades en diversos grups que siguin internament homogenis (les observacions dins el mateix grup són similars entre ells) i tinguin característiques diferents a la resta de grups.
 
@@ -498,7 +537,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         Existeix una gran varietat de tècniques de \textit{clustering} \citep{Karim2021, Min2018, Blekherman2011, Masood2015}. Encara que totes comparteixen un mateix objectiu, aborden el problema aplicant diferents criteris i per tant els grups que formen poden no coincidir. Algunes de les aproximacions més utilitzades històricament es basen en mètodes matemàtics i estadístics \citep{Masood2015}, com mètodes jeràrquics, mètodes basats en centroides, distribucions o densitats \citep{Karim2021}.
 
-        \textbf{Mètodes jeràrquics:} es basen en crear clústers amb un ordre predeterminat, on els clústers de més baix nivell es combinen iterativament per crear clústers més grans. Això els dota d'una estructura jeràrquica que es pot presentar en forma de dendrograma, però implica que l'assignació de cada punt a un clúster és determinista. Aquests algoritmes són sensibles al soroll \citep{Karim2021}.
+        \textbf{Mètodes jeràrquics:} es basen en crear clústers amb un ordre predeterminat, on els clústers de més baix nivell es combinen iterativament per crear clústers més grans. Això els dota d'una estructura jeràrquica que es pot presentar en forma de dendrograma, però implica que l'assignació de cada punt a un clúster és determinista. Aquests algoritmes no requereixen fixar prèviament un número de clústers, però són sensibles al soroll \citep{Karim2021}.
 
         \textbf{Mètodes basats en centroides:} (p. ex. \textit{k-means}) es basen assignar cada punt a un número predeterminat de grups i calcular els seus centroides. Després es canvia iterativament l'assignació de cada punt als diferents grups fins a minimitzar la suma de les distàncies de cada punt al centroide del seu grup. En general aconsegueixen un millor rendiment que els mètodes jeràrquics, però son incapaços de trobar grups no convexos \citep{Karim2021}.
 
@@ -532,6 +571,10 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     \section{Autoencoder}
     \label{s:state_ae}
 
+\todo{Afegir imatge tipus (comentari al codi)
+%https://en.wikipedia.org/wiki/Autoencoder#/media/File:Autoencoder_schema.png
+}
+
         L'arquitectura \gls{ae} està formada per dues parts: un codificador i un descodificador. La funció del codificador és representar l'entrada en un espai dimensional reduït, sovint un vector, anomenat codi. La funció del descodificador és reconstruir l'entrada original a partir del codi.
 
         Optimitzant els paràmetres d'ambdues parts conjuntament durant l'entrenament de la xarxa es busca aconseguir que el codificador sigui capaç de comprimir la entrada mantenint el màxim d'informació. Aplicant la idea de \gls{fl}, el codi esdevé la \gls{rl}.
@@ -562,6 +605,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
 
 \chapter{Materials i mètodes}
+\label{c:metodes}
     %En aquests apartats, cal descriure:
     %\begin{itemize}
     %    \item Els aspectes més rellevant del disseny i desenvolupament del treball.
@@ -642,7 +686,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         de les variables observades i latents.
         L'objectiu del codificador és aprendre els paràmetres $\theta$
         de la distribució $p_\theta(\mathbf{z|x})$
-        (la distribució posterior de $\mathbf{z}$ condicionada a $\mathbf{x}$)
+        (la distribució posterior de $\mathbf{z}$ condicionada a $\mathbf{x}$).
         De la mateixa manera,
         l'objectiu del descodificador és aprendre els paràmetres $\theta$
         de la distribució $p_\theta(\mathbf{x|z})$.
@@ -687,7 +731,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         Aquesta distribució marginal en el model bé donada per:
         \begin{equation}
         \label{eq:marginal_p_x}
-            p_\phi(\mathbf{x}) = \int p_\phi(\mathbf{x, z}) d\mathbf{z}
+            p_\theta(\mathbf{x}) = \int p_\theta(\mathbf{x, z}) d\mathbf{z}
         \end{equation}
 
         La integral en la \cref{eq:marginal_p_x} provoca que
@@ -813,7 +857,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         on la funció $g(\cdot)$ és una transformació determinista.
         Aquesta reparametrització s'il·lustra a la \cref{fig:reparametritzacio}.
         Llavors, el \gls{elbo} es pot reescriure
-        en funció de $\mathbb{E}_{p_(\epsilon)}$
+        en funció de $\mathbb{E}_{p(\epsilon)}$
         en lloc de $\mathbb{E}_{q_\phi(\mathbf{z|x})}$,
         de manera que ``s'externalitza'' la aleatorietat de la variable $\mathbf{z}$
         a la nova variable $\epsilon$.
@@ -860,7 +904,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         a continuació es resumeix com s'ha implementat el model \gls{vae}
         que s'ha construït en aquest \gls{tfm}.
         S'ha escollit que la variable latent $\mathbf{z}$
-        segueixi una distribució barreja de gaussianes:
+        segueixi una distribució normal multivariant:
 
         $$\mathbf{z} \sim \mathcal{N}(\mu, \sigma^2)$$
 
@@ -942,7 +986,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                 Representació esquemàtica d'una arquitectura \gls{vae}.
                 El codificador aprèn a representar l'entrada $\mathbf{x}$
                 en un espai latent $\mathbf{z}$
-                que segueix una distribució barreja de gaussianes,
+                que segueix una distribució normal multivariant,
                 amb un vector de mitjanes $\mu$ i un vector de variancies $\sigma$.
                 S'utilitza la reparametrització de $\mathbf{z}$ en funció de $\epsilon$.
                 El descodificador reconstrueix l'entrada
@@ -952,7 +996,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
             \label{fig:vae_min}
         \end{figure}
 
-    \subsection{Varational Deep Embedding}
+    \subsection{Variational Deep Embedding}
     \label{s:metodes_vade}
 
 \todo{Explicació model VaDE}
@@ -1314,11 +1358,11 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         amb diversos indicadors de salut.
 
         Es tracta d'un conjunt de 1120 observacions
-        sobre 411 metabolits
+        sobre 411 metabòlits
         obtingudes en tres moments diferents sobre els mateixos pacients,
         acompanyades de 16 covariables
-        de les cuals dues són categòriques
-        (gènere, índex de risc d'enfermetats cardiovasculars)
+        de les quals dues són categòriques
+        (gènere, índex de risc de malalties cardiovasculars)
         i la resta numèriques
         (edat i diversos indicadors de salut).
 
@@ -1479,7 +1523,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                 que es coneix dona bons resultats en aquest conjunt de dades \citep{Xie2015}:
                 tres capes ocultes amb mides 512, 512 i 2048.
 
-                S'han entrenat i avaluat els següents mètodes:
+                S'han contrastat els següents mètodes:
 
                 \begin{itemize}
                     \item Entrenar un model \gls{ae} amb les dades d'entrenament,
@@ -1497,6 +1541,11 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                     que reemplaça el \gls{ae} de l'arquitectura \gls{dec}
                     per un \gls{vae}.
                     Els paràmetres s'han inicialitzat amb \gls{kmeans} i amb \gls{gmm}.
+
+                    \item Repetir la mateixa operació,
+                    però mantenint el descodificador del model \gls{vae}
+                    i afegint la funció de cost de reconstrucció
+                    durant l'entrenament.
 
                     \item Entrenar i avaluar un model \gls{vade},
                     inicialitzant els paràmetres amb \gls{gmm}.
@@ -1542,26 +1591,28 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                     & \textbf{Nom}
                     & \textbf{Núm. classes}
                     & \textbf{Descripció}  \\ \midrule
-                    Fenotip     & birth\_weight & 4* & Pes al néixer.                      \\
-                    Fenotip     & iq            & 4* & Quocient d'intel·ligència.          \\
-                    Fenotip     & behaviour     & 4* & Comportament neurològic (índex).    \\
-                    Fenotip     & asthma        & 2  & Incidència d'asma.                  \\
-                    Fenotip     & bmi           & 4* & Índex de massa corporal.            \\
-                    Covariables & cohort        & 6  & Cohort d'inclusió a l'estudi.       \\
-                    Covariables & age           & 7  & Edat en anys.                       \\
-                    Covariables & sex           & 2  & Gènere.                             \\
-                    Covariables & education     & 3  & Nivell d'estudis de la mare.        \\
-                    Covariables & native        & 3  & Pares natius del país de naixement. \\
-                    Covariables & parity        & 3  & Nombre d'embarassos previs (mare).  \\
-                    \multicolumn{4}{l}{\footnotesize(* variables numèriques contínues, convertides en 4 grups mitjançant quantils.)} \\ \bottomrule
+                    Fenotip     & birth\_weight & 4\textsuperscript{*} & Pes al néixer.                      \\
+                    Fenotip     & iq            & 4\textsuperscript{*} & Quocient d'intel·ligència.          \\
+                    Fenotip     & behaviour     & 4\textsuperscript{*} & Comportament neurològic (índex).    \\
+                    Fenotip     & asthma        & 2                    & Incidència d'asma.                  \\
+                    Fenotip     & bmi           & 4\textsuperscript{*} & Índex de massa corporal.            \\
+                    Covariables & cohort        & 6                    & Cohort d'inclusió a l'estudi.       \\
+                    Covariables & age           & 7                    & Edat en anys.                       \\
+                    Covariables & sex           & 2                    & Gènere.                             \\
+                    Covariables & education     & 3                    & Nivell d'estudis de la mare.        \\
+                    Covariables & native        & 3                    & Pares natius del país de naixement. \\
+                    Covariables & parity        & 3                    & Nombre d'embarassos previs (mare).  \\ \bottomrule
                 \end{tabular}
-                \caption[Exposome Data Challenge Event: covariables seleccionades]{Variables independents seleccionades del conjunt de dades Exposome Data Challenge Event.}
+                \caption[Exposome Data Challenge Event: covariables seleccionades]{
+                    Variables independents seleccionades del conjunt de dades Exposome Data Challenge Event.
+                    \newline \textsuperscript{*}Variables numèriques contínues,
+                    convertides en 4 grups mitjançant quantils.}
                 \label{t:exposome_vars}
             \end{table}
 
             S'han estudiat independentment dos conjunts de dades:
             les dades metabolòmiques
-            (s'ha unint les lectures en sèrum i en orina
+            (s'ha unit les lectures en sèrum i en orina
             per obtenir un conjunt de dades més gran)
             i les dades del exposoma.
 
@@ -1676,7 +1727,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
             Com a grups objectiu contra els que avaluar les mètriques
             s'han seleccionat dues variables categòriques de les covariables,
             que s'ha trobat mostren una distribució diferencial per la resta de covariables
-            (indicadors biològics relacionats amb la salut) (veure \cref{t:dadespriv_vars})
+            (indicadors biològics relacionats amb la salut) (veure \cref{t:dadespriv_vars}).
             Tots els mètodes s'han avaluat fixant el número de clústers a 2 i 3.
 
 %            \setlength\arrayrulewidth{1pt}
@@ -1726,24 +1777,24 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
             \centering
             \begin{tabular}{@{}cccccc@{}}
                 \toprule
-                \textbf{Conjunt de dades} & \textbf{Tipus} & \textbf{Feature learning} & \textbf{Clustering} & \textbf{Inicialització} & \textbf{Variacions} \\ \midrule
+                \textbf{Conjunt de dades} & \textbf{Tipus} & \textbf{\textit{Feature learning}} & \textbf{\textit{Clustering}} & \textbf{Inicialització} & \textbf{Variacions} \\ \midrule
                 \multirow{6}{*}{\textbf{MNIST}} & Clàssic & Cap, PCA & K-means, GMM & - & - \\
-                & \multirow{5}{*}{Deep learning} & AE & K-means, GMM & - & - \\
+                & \multirow{5}{*}{\textit{Deep learning}} & AE & K-means, GMM & - & - \\
                 &  & VAE & K-means, GMM & - & - \\
                 &  & DEC & DEC & K-means, GMM & - \\
-                &  & VAE+DEC & VAE+DEC & K-means, GMM & - \\
+                &  & VAE+DEC & VAE+DEC & K-means, GMM & Mantenir descodificador \\
                 &  & VaDE & VaDE & GMM & - \\ \midrule
                 \multirow{6}{*}{\begin{tabular}[c]{@{}c@{}}\textbf{ExposomeChall.}\\ \textbf{(metaboloma)}\end{tabular}} & \multirow{2}{*}{Clàssic} & \multirow{2}{*}{Cap, PCA} & \multirow{2}{*}{K-means, GMM} & \multirow{2}{*}{-} & Selecció de variables, \\
                 &  &  &  &  & Correcció efecte lot \\ \cmidrule(l){6-6}
-                & \multirow{4}{*}{Deep learning} & \multirow{2}{*}{DEC} & \multirow{2}{*}{DEC} & \multirow{2}{*}{K-means, GMM} & Selecció de variables, \\
+                & \multirow{4}{*}{\textit{Deep learning}} & \multirow{2}{*}{DEC} & \multirow{2}{*}{DEC} & \multirow{2}{*}{K-means, GMM} & Selecció de variables, \\
                 &  &  &  &  & Correcció efecte lot, \\
                 &  & \multirow{2}{*}{VaDE} & \multirow{2}{*}{VaDE} & \multirow{2}{*}{GMM} & augment de dades, \\
                 &  &  &  &  & conv 1D, 2D \\ \cmidrule(l){6-6}
                 \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}\textbf{ExposomeChall.}\\ \textbf{(exposoma)}\end{tabular}} & Clàssic & Cap, PCA & K-means, GMM & - & \multirow{3}{*}{Correcció efecte lot} \\
-                & \multirow{2}{*}{Deep learning} & DEC & DEC & K-means, GMM &  \\
+                & \multirow{2}{*}{\textit{Deep learning}} & DEC & DEC & K-means, GMM &  \\
                 &  & VaDE & VaDE & GMM &  \\ \midrule
                 \multirow{3}{*}{\textbf{Dades privades}} & Clàssic & Cap, PCA & K-means, GMM & - & - \\
-                & \multirow{2}{*}{Deep learning} & DEC & DEC & K-means, GMM & - \\
+                & \multirow{2}{*}{\textit{Deep learning}} & DEC & DEC & K-means, GMM & - \\
                 &  & VaDE & VaDE & GMM & - \\ \bottomrule
             \end{tabular}
             \caption[Tècniques de \textit{clustering} per conjunt de dades]{Resum de les tècniques de \textit{clustering}
@@ -1787,6 +1838,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
 
 \chapter{Resultats}
+\label{c:resultats}
     %Detalleu en aquest apartat els resultats obtinguts utilitzant la metodologia descrita a l’apartat anterior.
     %Recull dels resultats del treball. Hauria d'haver-hi una correspondència amb la metodologia en el sentit que els resultats és el que s'obté després d'haver aplicat la metodologia.
     %Les figures han d'estar explicades i citades en el text, com la \ref{fig:my_label}, en la qual es mostra l'error en funció de la distància, en unitats arbitràries. A totes les gràfiques ha d'haver el títol dels eixos.
@@ -1797,9 +1849,157 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     %    \label{fig:my_label}
     %\end{figure}
 
+
+
+    \begin{table}[p]
+        \small
+        \centering
+        \begin{minipage}{\textwidth}
+
+        \begin{tabular}{@{}cccccccc@{}}
+            \toprule
+            \textbf{Tipus} & \textbf{\textit{Feature learning}} & \textbf{\textit{Clustering}} & \textbf{Inicialització} & \textbf{Acc} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil} \\ \midrule
+            \multirow{2}{*}{Clàssic} & \multirow{2}{*}{-} & K-means & - & 0.59 & 0.41 & 0.53 & 0.06 \\
+            &  & GMM & - & 0.44 & 0.22 & 0.34 & 0.02 \\
+            \multirow{13}{*}{\textit{Deep learning}} & \multirow{2}{*}{PCA} & K-Means & - & 0.59 & 0.41 & 0.53 & 0.09 \\
+            &  & GMM & - & 0.47 & 0.23 & 0.43 & 0.02 \\  \midrule
+            & \multirow{2}{*}{AE} & K-means & - & 0.83 & 0.69 & 0.73 & 0.19 \\
+            &  & GMM & - & 0.77 & 0.57 & 0.68 & 0.14 \\
+            & \multirow{2}{*}{DEC} & DEC & K-means & 0.83 & 0.69 & 0.74 & 0.93 \\
+            &  & DEC & GMM & 0.76 & 0.56 & 0.69 & 0.93 \\
+            & \multirow{2}{*}{VAE} & K-means & - & 0.59 & 0.41 & 0.54 & 0.16 \\
+            &  & GMM & - & 0.48 & 0.25 & 0.39 & -0.01 \\
+            & \multirow{2}{*}{VAE+DEC\textsuperscript{1}} & VAE+DEC\textsuperscript{1} & K-Means & 0.61 & 0.42 & 0.54 & 0.90 \\
+            &  & VAE+DEC\textsuperscript{1} & GMM & 0.57 & 0.31 & 0.47 & 0.87 \\
+            & \multirow{2}{*}{VAE+DEC\textsuperscript{2}} & VAE+DEC\textsuperscript{2} & K-means & 0.57 & 0.37 & 0.49 & 0.20 \\
+            &  & VAE+DEC\textsuperscript{2} & GMM & 0.59 & 0.36 & 0.49 & 0.12 \\
+            & VaDE & VaDE & GMM & 0.94 & 0.88 & 0.88 & 0.23 \\ \bottomrule
+        \end{tabular}
+        \caption[MNIST: resultats]{Resum dels resultats obtinguts sobre els conjunt de dades \gls{mnist}.
+            \newline \textsuperscript{1} Model sense descodificador i per tant sense funció de cost de reconstrucció.
+            \newline \textsuperscript{2} Model amb descodificador i funció de cost de reconstrucció.
+        }
+        \label{t:results_mnist}
+        \end{minipage}
+    \end{table}
+
+
+    \begin{table}[p]
+        \small
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \begin{tabular}[c]{@{}c@{}}Modificació\\ dades\end{tabular} & Tipus & \textit{Feature learning} & \textit{Clustering} & Inicialització & Acc. & ARI & AMI & Sil. \\ \midrule
+            \multirow{13}{*}{-} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
+            &  &  & GMM & - & 0.46 & 0 & 0 & 0 \\
+            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.09 \\
+            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.05 \\
+            &  &  & GMM & - & 0.46 & 0 & 0 & 0.06 \\
+            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
+            & \multirow{7}{*}{\textit{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.54 \\
+            &  & DEC + D.A. & DEC & K-Means & 0.48 & 0 & 0 & 0.83 \\
+            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.17 \\
+            &  & VaDE + D.A. & VaDE & GMM & 0.48 & 0 & 0 & 0.19 \\
+            &  & DEC (conv. 1D) & DEC & K-Means & 0.48 & 0 & 0 & 0.69 \\
+            &  & DEC (conv. 2D) & DEC & K-Means & 0.48 & 0 & 0 & 0.46 \\
+            &  & VaDE (conv. 1D) & VaDE & GMM & 0.48 & 0 & 0 & 0.21 \\ \midrule
+            \multirow{10}{*}{\begin{tabular}[c]{@{}c@{}}Selecció de\\ variables\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.07 \\
+            &  &  & GMM & - & 0.46 & 0 & 0 & 0.05 \\
+            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.08 \\
+            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
+            &  &  & GMM & - & 0.46 & 0 & 0 & 0.05 \\
+            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
+            & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.5 \\
+            &  & DEC (D.A.) & DEC & K-Means & 0.48 & 0 & 0 & 0.77 \\
+            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.17 \\
+            &  & VaDE (D.A.) & VaDE & GMM & 0.48 & 0 & 0 & 0.28 \\ \midrule
+            \multirow{8}{*}{\begin{tabular}[c]{@{}c@{}}Correcció\\ efecte lot\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.07 \\
+            &  &  & GMM & - & 0.46 & 0 & 0 & 0.02 \\
+            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.09 \\
+            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
+            &  &  & GMM & - & 0.46 & 0 & 0 & 0.07 \\
+            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
+            & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.49 \\
+            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.22 \\\bottomrule
+            \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats (metaboloma)]{
+            Resum dels resultats obtinguts sobre el subcojunt de dades metabolòmiques
+            del conjunt de dades Exposome Data Challenge Event
+            (les puntuacions són la mitjana per tots els números de clústers avaluats).}
+        \label{t:metabol_results}
+    \end{table}
+
+
+        \begin{table}[p]
+            \small
+            \centering
+            \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \begin{tabular}[c]{@{}c@{}}Modificació\\ dades\end{tabular}  & Tipus & \textit{Feature learning} & \textit{Clustering} & Inicialització & Acc. & ARI & AMI & Sil. \\ \midrule
+            \multirow{8}{*}{-} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.6 & 0.17 & 0.18 & 0.13 \\
+            &  &  & GMM & - & 0.59 & 0.16 & 0.18 & 0.11 \\
+            &  &  & K-Means & - & 0.59 & 0.16 & 0.18 & 0.13 \\
+            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.6 & 0.17 & 0.18 & 0.1 \\
+            &  &  & GMM & - & 0.59 & 0.17 & 0.19 & 0.1 \\
+            &  &  & K-Means & - & 0.59 & 0.16 & 0.18 & 0.1 \\
+            & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.6 & 0.16 & 0.17 & 0.79 \\
+            &  & VaDE & VaDE & GMM & 0.58 & 0.12 & 0.14 & 0.45 \\ \midrule
+            \multirow{8}{*}{\begin{tabular}[c]{@{}c@{}}Correcció\\ efecte lot\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.02 \\
+            &  &  & GMM & - & 0.46 & 0 & 0 & 0.02 \\
+            &  &  & K-Means & - & 0.47 & 0 & 0 & 0.03 \\
+            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.02 \\
+            &  &  & GMM & - & 0.49 & 0.02 & 0.02 & 0 \\
+            &  &  & K-Means & - & 0.47 & 0 & 0 & 0.02 \\
+            & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.64 \\
+            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.27 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats (exposoma)]{
+            Resum dels resultats obtinguts sobre el subcojunt de dades de l'exposoma
+            del conjunt de dades Exposome Data Challenge Event
+            (les puntuacions són la mitjana per tots els números de clústers avaluats).}
+        \label{t:exposome_results}
+    \end{table}
+
+    \begin{sidewaystable}[p]
+        \small
+        \centering
+        \begin{tabular}{@{}lllllllllll@{}}
+            \toprule
+            \textbf{Tipus} & \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} & \textbf{\begin{tabular}[c]{@{}l@{}}Mateix\\ clúst.\end{tabular}} \\ \midrule
+            \multirow{18}{*}{Clàssic} & \multirow{6}{*}{-} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.25 & 0.47 \\
+            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.09 & 0.21 \\
+            &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0 & 0 & 0.17 & 0.33 \\
+            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.1 & 0.17 \\
+            &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.24 & 0.46 \\
+            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.11 & 0.18 \\
+            & \multirow{6}{*}{PCA} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.29 & 0.47 \\
+            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.12 & 0.2 \\
+            &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0.01 & 0.01 & 0.14 & 0.24 \\
+            &  &  & - & 3 & CVrisk3 & 0.37 & 0 & 0 & 0.02 & 0.12 \\
+            &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.38 & 0.75 \\
+            &  &  & - & 3 & CVrisk3 & 0.35 & 0 & 0 & 0.1 & 0.24 \\
+            & \multirow{6}{*}{\begin{tabular}[c]{@{}l@{}}Selecció \\ de variables\\ +\\ PCA\end{tabular}} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.32 & 0.48 \\
+            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.14 & 0.2 \\
+            &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0.01 & 0.01 & 0.16 & 0.25 \\
+            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.02 & 0.14 \\
+            &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.28 & 0.41 \\
+            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.22 & 0.39 \\
+            \multirow{4}{*}{\textit{\begin{tabular}[c]{@{}l@{}}Deep\\ clustering\end{tabular}}} & \multirow{2}{*}{DEC} & DEC & K-Means & 2 & gender & 0.55 & 0 & 0 & 0.96 & 0.35 \\
+            &  & DEC & K-Means & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.93 & 0.15 \\
+            & \multirow{2}{*}{VaDE} & VaDE & GMM & 2 & gender & 0.55 & 0 & 0 & 0.57 & 0.3 \\
+            &  & VaDE & GMM & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.45 & 0.2 \\ \bottomrule
+        \end{tabular}
+        \caption[Dades privades: resultats]{Resum dels resultats obtinguts sobre el cojunt de dades metabolòmiques privades}
+        \label{t:dadespriv_results}
+    \end{sidewaystable}
+
+
+
+
 \todo{Presentar resultats: resum de les mètriques, taules mètriques, gràfiques.}
 
 \chapter{Discussió}
+\label{c:discussio}
     %Discussió dels resultats en el context del projecte. És en aquest apartat on cobren sentit i en el qual es responen les preguntes de recerca i es mostra com els resultats donen resposta als problemes plantejats.
     %Aquesta part pot ser que no apliqui segons el tipus de treball.
 
@@ -1815,7 +2015,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 }
 
 \chapter{Valoració econòmica}
-\label{s:economica}
+\label{c:economic}
     %En cas que correspongui, s'inclourà un apartat de ``Valoració econòmica del treball". Aquest apartat indicarà les despeses associades al desenvolupament i manteniment del treball, així com els beneficis econòmics obtinguts. Cal fer una anàlisi final sobre la viabilitat del producte.
 
     La realització d'aquest \gls{tfm} ha requerit d'una única despesa econòmica:
@@ -1848,6 +2048,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
 
 \chapter{Conclusions i treballs futurs}
+\label{c:conclusions}
 
     \section{Conclusions}
     \label{s:conclusions}
@@ -1903,16 +2104,11 @@ Problema intepretabilitat de les dades metabolòmiques?}
 
 \todo{Resumir problemes comentats als informes de PAC2 i PAC3.}
 
-\chapter{Glossari i abreviacions}
-    %Definició dels termes i acrònims més rellevants utilitzats dins la Memòria.
 
-\todo{Necessari afegir un glossari o és suficient amb les abreviacions?}
+% GLOSSARI
+\printglossary[type=\acronymtype, title={Glossari i abreviacions}]
 
-%    \section{Glossari}
-
-    %Abreviacions:
-    \printglossary[type=\acronymtype, title={Abreviacions}]
-
+% BIBLIOGRAFIA
 %\chapter{Bibliografia} %\bibliography{} ja afegeix el \chapter{} corresponent!
 \bibliographystyle{ieeetr}
 \bibliography{TFM, TFM-software}
@@ -1923,8 +2119,786 @@ Problema intepretabilitat de les dades metabolòmiques?}
 %Llistat d’apartats que són massa extensos per incloure dins la memòria i tenen un caràcter autocontingut (per exemple, manuals d’usuari, manuals d’instal·lació, etc.)
 %Depenent del tipus de treball, és possible que no calgui afegir cap annex.
 
-%\chapter{Exemple d'annex}
-%    \section{Annex 1}
+\chapter{Exposome Data Challenge Event: resultats complets}
+
+    \section{Gràfiques radials}
+
+        A continuació es mostren les gràfiques radials
+        que representen la distribució multivariant
+        de les dades del fenotip i covariables,
+        en segons dels clústers trobats.
+        S'han ordenat en funció del conjunt de dades
+        sobre el que s'han aplicat els mètodes de \textit{clustering}.
+%
+%        \subsection{Conjunt de dades: metaboloma}
+%
+%            \paragraph{Dades fenotip:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_feno_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_feno_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_feno_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_feno_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_feno_k7.png}
+%
+%            \paragraph{Dades covariables:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_covars_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_covars_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_covars_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_covars_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_covars_k7.png}
+%
+%            \paragraph{Dades metaboloma:} distribució multivariant en funció dels clústers (20 variables amb major variablitat).
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_mostvarfeat_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_mostvarfeat_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_mostvarfeat_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_mostvarfeat_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_uncorr_mostvarfeat_k7.png}
+%
+%        \subsection{Conjunt de dades: metaboloma (corregit per l'efecte de log)}
+%
+%            \paragraph{Dades fenotip:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_feno_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_feno_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_feno_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_feno_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_feno_k7.png}
+%
+%            \paragraph{Dades covariables:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_covars_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_covars_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_covars_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_covars_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_covars_k7.png}
+%
+%            \paragraph{Dades metaboloma:} distribució multivariant en funció dels clústers (20 variables amb major variablitat).
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_mostvarfeat_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_mostvarfeat_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_mostvarfeat_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_mostvarfeat_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_mostvarfeat_k7.png}
+%
+%        \subsection{Conjunt de dades: exposoma}
+%
+%            \paragraph{Dades fenotip:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_feno_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_feno_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_feno_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_feno_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_feno_k7.png}
+%
+%            \paragraph{Dades covariables:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_covars_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_covars_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_covars_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_covars_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_covars_k7.png}
+%
+%            \paragraph{Dades metaboloma:} distribució multivariant en funció dels clústers (20 variables amb major variablitat).
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_mostvarfeat_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_mostvarfeat_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_mostvarfeat_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_mostvarfeat_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_uncorr_mostvarfeat_k7.png}
+%
+%        \subsection{Conjunt de dades: exposoma (corregit per l'efecte de log)}
+%
+%            \paragraph{Dades fenotip:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_feno_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_feno_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_feno_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_feno_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_feno_k7.png}
+%
+%            \paragraph{Dades covariables:} distribució multivariant en funció dels clústers.
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_covars_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_covars_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_covars_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_covars_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_covars_k7.png}
+%
+%            \paragraph{Dades metaboloma:} distribució multivariant en funció dels clústers (20 variables amb major variablitat).
+%
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_mostvarfeat_k2.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_mostvarfeat_k3.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_mostvarfeat_k4.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_mostvarfeat_k6.png}
+%            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_mostvarfeat_k7.png}
+%
+%    \section{Heatmaps}
+%
+%        A continuació es mostren les comparacions
+%        de les assignacions de clústers per cada mostra,
+%        agrupades en funcio del conjunt de dades
+%        sobre el que s'han aplicat els mètodes de \textit{clustering}.
+%
+%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/metabol_uncorrected.png}
+%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/metabol_corrected.png}
+%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/exposome_uncorrected.png}
+%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/exposome_corrected.png}
+
+
+    \section{Taules de mètriques}
+
+    En les següents pàgines es mostren els resultats complets
+    de les mètriques mesurades en el conjunt de dades
+    Exposome Data Challenge Event.
+
+%    \setlength\arrayrulewidth{1pt}
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{30}{*}{-} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.1 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.1 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.07 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.07 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.07 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.06 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.06 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.06 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.05 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.05 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.1 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.1 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.06 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.06 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.06 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.06 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.06 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.06 \\
+            &  &  & 6 & cohort & 0.22 & 0 & 0 & 0.04 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.04 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.09 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.09 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.05 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.05 \\
+            &  &  & 3 & parity & 0.46 & 0 & 0 & 0.05 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.04 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.04 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.04 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.02 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.02 \\ \midrule
+            \multirow{30}{*}{PCA} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.13 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.13 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.08 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.08 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.08 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.08 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.08 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.08 \\
+            &  &  & 6 & cohort & 0.22 & 0 & 0 & 0.06 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.06 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.02 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.02 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.02 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.02 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.02 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0 \\
+            &  &  & 4 & iq & 0.32 & 0.01 & 0.01 & 0 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & -0.02 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & -0.02 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.11 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.11 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.06 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.06 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.06 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.05 \\
+            &  &  & 4 & iq & 0.29 & 0 & 0 & 0.05 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.05 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0.03 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.03 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 1]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt metaboloma, dades originals, tècniques clàssiques).
+        }
+        \label{t:results_exposome1}
+    \end{table}
+
+    \newpage
+    \scriptsize
+    \begin{center}
+        \begin{longtable}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \hline
+            \multirow{11}{*}{DEC} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.7 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.7 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.64 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.64 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.64 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.45 \\
+            &  &  & 4 & iq & 0.29 & 0 & 0 & 0.45 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.45 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.45 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.4 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.42 \\ \midrule
+            \multirow{11}{*}{VaDE} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.29 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.29 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.16 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.16 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.16 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.15 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.15 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.15 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.15 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.11 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.09 \\ \midrule
+            \multirow{11}{*}{DEC (D.A.)} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.95 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.95 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.91 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.91 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.91 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.77 \\
+            &  &  & 4 & iq & 0.31 & 0.01 & 0 & 0.77 \\
+            &  &  & 4 & behaviour & 0.3 & 0 & 0 & 0.77 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.77 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0.77 \\
+            &  &  & 7 & age & 0.32 & 0 & 0.01 & 0.71 \\ \midrule
+            \multirow{11}{*}{VaDE (D.A.)} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.35 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.35 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.18 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.18 \\
+            &  &  & 3 & parity & 0.47 & 0.01 & 0 & 0.18 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.18 \\
+            &  &  & 4 & iq & 0.31 & 0 & 0 & 0.18 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.18 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.18 \\
+            &  &  & 6 & cohort & 0.22 & 0 & 0 & 0.1 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.07 \\ \midrule
+            \multirow{11}{*}{DEC (conv. 1D)} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.64 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.64 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.59 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.59 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.59 \\
+            &  &  & 4 & birth\_weight & 0.25 & 0 & 0 & 1 \\
+            &  &  & 4 & iq & 0.28 & 0 & 0 & 1 \\
+            &  &  & 4 & behaviour & 0.25 & 0 & 0 & 1 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 1 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0.28 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.22 \\ \midrule
+            \multirow{11}{*}{VaDE (conv. 1D)} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.38 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.38 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.2 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.2 \\
+            &  &  & 3 & parity & 0.46 & 0 & 0 & 0.2 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.18 \\
+            &  &  & 4 & iq & 0.31 & 0.01 & 0 & 0.18 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.18 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.18 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.12 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.09 \\ \midrule
+            \multirow{11}{*}{DEC (conv. 2D)} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.6 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.6 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.56 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.56 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.56 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.39 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.39 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.39 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.39 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0.33 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.29 \\ \bottomrule
+        \caption[Exposome Data Challenge Event: resultats - part 2]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt metaboloma, dades sense originals, tècniques de \textit{deep clustering}).
+        }
+        \label{t:results_exposome2}
+        \end{longtable}
+    \end{center}
+    \normalsize
+
+    \begin{table}[p]
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{30}{*}{-} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.08 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.08 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.08 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.08 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.08 \\
+            &  &  & 4 & birth\_weight & 0.26 & 0 & 0 & 0.07 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.07 \\
+            &  &  & 4 & behaviour & 0.29 & 0 & 0 & 0.07 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.06 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.06 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.06 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.06 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.05 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.05 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.05 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.04 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.04 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.04 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.03 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.04 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.1 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.1 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.06 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.06 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.06 \\
+            &  &  & 4 & birth\_weight & 0.26 & 0 & 0 & 0.05 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.05 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.05 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0.03 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.03 \\ \midrule
+            \multirow{30}{*}{PCA} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.09 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.09 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.09 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.09 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.09 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.08 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.08 \\
+            &  &  & 4 & behaviour & 0.29 & 0 & 0 & 0.08 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.07 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.07 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.06 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.06 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.05 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.05 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.05 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.06 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.06 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.06 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0.01 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.03 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.11 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.11 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.07 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.07 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.07 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.05 \\
+            &  &  & 4 & iq & 0.33 & 0.01 & 0.01 & 0.05 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.05 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.06 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.04 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 3]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt metaboloma, subset de variables amb major variància, tècniques clàssiques).
+        }
+        \label{t:results_exposome3}
+    \end{table}
+
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{11}{*}{DEC} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.69 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.69 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.54 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.54 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.54 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.48 \\
+            &  &  & 4 & iq & 0.31 & 0 & 0 & 0.48 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.48 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.48 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.4 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.22 \\ \midrule
+            \multirow{11}{*}{VaDE} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.31 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.31 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.22 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.22 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.22 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.13 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.13 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.13 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.13 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.13 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0 \\ \midrule
+            \multirow{11}{*}{DEC (D.A.)} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.93 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.93 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.87 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.87 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.87 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.71 \\
+            &  &  & 4 & iq & 0.3 & 0.01 & 0 & 0.71 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.71 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.71 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.61 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.57 \\ \midrule
+            \multirow{11}{*}{VaDE (D.A.)} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.48 \\
+            &  &  & 2 & sex & 0.54 & 0 & 0 & 0.48 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.32 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.32 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.32 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.24 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.24 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.24 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.24 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.15 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.04 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 4]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt metaboloma, subset de variables amb major variància, tècniques de \textit{deep clustering}).
+        }
+        \label{t:results_exposome4}
+    \end{table}
+
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{30}{*}{-} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.12 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.12 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.07 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.07 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.07 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.06 \\
+            &  &  & 4 & iq & 0.29 & 0 & 0 & 0.06 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.06 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.05 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.04 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.12 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.12 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.06 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.06 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.06 \\
+            &  &  & 4 & birth\_weight & 0.29 & 0 & 0 & 0.05 \\
+            &  &  & 4 & iq & 0.29 & 0 & 0 & 0.05 \\
+            &  &  & 4 & behaviour & 0.26 & 0 & 0 & 0.05 \\
+            &  &  & 6 & cohort & 0.22 & 0 & 0 & 0.05 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.04 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.1 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.1 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.06 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.06 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.06 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.05 \\
+            &  &  & 4 & iq & 0.29 & 0 & 0 & 0.05 \\
+            &  &  & 4 & behaviour & 0.26 & 0 & 0 & 0.05 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.02 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.02 \\ \midrule
+            \multirow{30}{*}{PCA} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.14 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.14 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.08 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.08 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.08 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.08 \\
+            &  &  & 4 & iq & 0.29 & 0 & 0 & 0.08 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.08 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.07 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.06 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.03 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.03 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.03 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.03 \\
+            &  &  & 3 & parity & 0.46 & 0 & 0 & 0.03 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.02 \\
+            &  &  & 4 & iq & 0.29 & 0 & 0 & 0.02 \\
+            &  &  & 4 & behaviour & 0.26 & 0 & 0 & 0.02 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & -0.01 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.12 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.12 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.07 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.07 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.07 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.06 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.06 \\
+            &  &  & 4 & behaviour & 0.26 & 0 & 0 & 0.06 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.04 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.04 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 5]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt metaboloma, dades corregides, tècniques clàssiques).
+        }
+        \label{t:results_exposome5}
+    \end{table}
+
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{11}{*}{DEC} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.69 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.69 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.43 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.43 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.43 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.44 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.44 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.44 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.44 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.61 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.32 \\ \midrule
+            \multirow{11}{*}{VaDE} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.35 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.35 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.24 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.24 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.24 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.18 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.18 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.18 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.18 \\
+            &  &  & 6 & cohort & 0.2 & 0 & 0 & 0.16 \\
+            &  &  & 7 & age & 0.32 & 0.01 & 0 & 0.11 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part6]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt metaboloma, dades corregides, tècniques de \textit{deep clustering}).
+        }
+        \label{t:results_exposome6}
+    \end{table}
+
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{30}{*}{-} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.1 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.1 \\
+            &  &  & 3 & education & 0.53 & 0.05 & 0.02 & 0.09 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.09 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.09 \\
+            &  &  & 4 & birth\_weight & 0.33 & 0.02 & 0.03 & 0.11 \\
+            &  &  & 4 & iq & 0.43 & 0.1 & 0.14 & 0.11 \\
+            &  &  & 4 & behaviour & 0.34 & 0.02 & 0.05 & 0.11 \\
+            &  &  & 6 & cohort & 0.99 & 0.98 & 0.97 & 0.12 \\
+            &  &  & 7 & age & 0.59 & 0.48 & 0.58 & 0.11 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.07 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.07 \\
+            &  &  & 3 & education & 0.53 & 0.05 & 0.02 & 0.09 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.09 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.09 \\
+            &  &  & 4 & birth\_weight & 0.33 & 0.02 & 0.03 & 0.11 \\
+            &  &  & 4 & iq & 0.47 & 0.2 & 0.26 & 0.11 \\
+            &  &  & 4 & behaviour & 0.31 & 0.01 & 0.02 & 0.11 \\
+            &  &  & 6 & cohort & 0.99 & 0.99 & 0.98 & 0.12 \\
+            &  &  & 7 & age & 0.59 & 0.48 & 0.58 & 0.11 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.09 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.09 \\
+            &  &  & 3 & education & 0.56 & 0.06 & 0.03 & 0.1 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.1 \\
+            &  &  & 3 & parity & 0.47 & 0.01 & 0.01 & 0.1 \\
+            &  &  & 4 & birth\_weight & 0.33 & 0.02 & 0.03 & 0.11 \\
+            &  &  & 4 & iq & 0.43 & 0.1 & 0.14 & 0.11 \\
+            &  &  & 4 & behaviour & 0.34 & 0.02 & 0.05 & 0.11 \\
+            &  &  & 6 & cohort & 0.99 & 0.98 & 0.97 & 0.12 \\
+            &  &  & 7 & age & 0.59 & 0.48 & 0.58 & 0.1 \\ \midrule
+            \multirow{30}{*}{PCA} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.12 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.12 \\
+            &  &  & 3 & education & 0.53 & 0.05 & 0.02 & 0.12 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.12 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.12 \\
+            &  &  & 4 & birth\_weight & 0.33 & 0.02 & 0.03 & 0.14 \\
+            &  &  & 4 & iq & 0.43 & 0.1 & 0.14 & 0.14 \\
+            &  &  & 4 & behaviour & 0.34 & 0.02 & 0.05 & 0.14 \\
+            &  &  & 6 & cohort & 0.99 & 0.98 & 0.97 & 0.16 \\
+            &  &  & 7 & age & 0.58 & 0.47 & 0.57 & 0.14 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.05 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.05 \\
+            &  &  & 3 & education & 0.54 & 0.02 & 0.03 & 0.09 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.09 \\
+            &  &  & 3 & parity & 0.47 & 0.01 & 0.01 & 0.09 \\
+            &  &  & 4 & birth\_weight & 0.32 & 0.02 & 0.02 & 0.13 \\
+            &  &  & 4 & iq & 0.43 & 0.09 & 0.14 & 0.13 \\
+            &  &  & 4 & behaviour & 0.34 & 0.02 & 0.05 & 0.13 \\
+            &  &  & 6 & cohort & 0.99 & 0.97 & 0.96 & 0.16 \\
+            &  &  & 7 & age & 0.58 & 0.47 & 0.56 & 0.13 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.12 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.12 \\
+            &  &  & 3 & education & 0.56 & 0.06 & 0.03 & 0.13 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.13 \\
+            &  &  & 3 & parity & 0.47 & 0.01 & 0.01 & 0.13 \\
+            &  &  & 4 & birth\_weight & 0.33 & 0.02 & 0.03 & 0.13 \\
+            &  &  & 4 & iq & 0.43 & 0.1 & 0.14 & 0.13 \\
+            &  &  & 4 & behaviour & 0.34 & 0.02 & 0.05 & 0.13 \\
+            &  &  & 6 & cohort & 0.99 & 0.97 & 0.96 & 0.16 \\
+            &  &  & 7 & age & 0.58 & 0.47 & 0.58 & 0.14 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 7]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt exposoma, dades sense corregir, tècniques clàssiques).
+        }
+        \label{t:results_exposome7}
+    \end{table}
+
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{11}{*}{DEC} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.89 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.89 \\
+            &  &  & 3 & education & 0.51 & 0.13 & 0.11 & 0.8 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.8 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.8 \\
+            &  &  & 4 & birth\_weight & 0.33 & 0.03 & 0.03 & 0.77 \\
+            &  &  & 4 & iq & 0.43 & 0.11 & 0.17 & 0.77 \\
+            &  &  & 4 & behaviour & 0.33 & 0.03 & 0.03 & 0.77 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.77 \\
+            &  &  & 6 & cohort & 0.99 & 0.98 & 0.97 & 0.74 \\
+            &  &  & 7 & age & 0.58 & 0.47 & 0.56 & 0.73 \\ \midrule
+            \multirow{11}{*}{VaDE} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.52 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.52 \\
+            &  &  & 3 & education & 0.55 & 0.07 & 0.03 & 0.49 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.49 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.49 \\
+            &  &  & 4 & birth\_weight & 0.32 & 0.01 & 0.02 & 0.36 \\
+            &  &  & 4 & iq & 0.41 & 0.07 & 0.11 & 0.36 \\
+            &  &  & 4 & behaviour & 0.34 & 0.03 & 0.04 & 0.36 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.36 \\
+            &  &  & 6 & cohort & 0.82 & 0.71 & 0.82 & 0.45 \\
+            &  &  & 7 & age & 0.57 & 0.46 & 0.54 & 0.58 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 8]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt exposoma, dades sense corregir, tècniques de \textit{deep clustering}).
+        }
+        \label{t:results_exposome8}
+    \end{table}
+
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{30}{*}{-} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.03 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.03 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.03 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.03 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.03 \\
+            &  &  & 4 & birth\_weight & 0.29 & 0 & 0 & 0.03 \\
+            &  &  & 4 & iq & 0.31 & 0 & 0 & 0.03 \\
+            &  &  & 4 & behaviour & 0.29 & 0.01 & 0.01 & 0.03 \\
+            &  &  & 6 & cohort & 0.23 & 0 & 0 & 0.02 \\
+            &  &  & 7 & age & 0.33 & 0.01 & 0 & 0.02 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.01 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.01 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.01 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.01 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.01 \\
+            &  &  & 4 & birth\_weight & 0.31 & 0.01 & 0.01 & -0.01 \\
+            &  &  & 4 & iq & 0.32 & 0.01 & 0.02 & -0.01 \\
+            &  &  & 4 & behaviour & 0.31 & 0.01 & 0.01 & -0.01 \\
+            &  &  & 6 & cohort & 0.28 & 0.07 & 0.09 & 0 \\
+            &  &  & 7 & age & 0.4 & 0.11 & 0.11 & -0.01 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.04 \\
+            &  &  & 2 & sex & 0.54 & 0 & 0 & 0.04 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.02 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.02 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.02 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.01 \\
+            &  &  & 4 & iq & 0.31 & 0 & 0 & 0.01 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.01 \\
+            &  &  & 6 & cohort & 0.22 & 0 & 0 & 0.01 \\
+            &  &  & 7 & age & 0.32 & 0.01 & 0 & 0.01 \\ \midrule
+            \multirow{30}{*}{PCA} & \multirow{10}{*}{K-Means} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.04 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.04 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.03 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.03 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.03 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.03 \\
+            &  &  & 4 & iq & 0.31 & 0 & 0 & 0.03 \\
+            &  &  & 4 & behaviour & 0.29 & 0 & 0.01 & 0.03 \\
+            &  &  & 6 & cohort & 0.23 & 0 & 0 & 0.02 \\
+            &  &  & 7 & age & 0.32 & 0 & 0.01 & 0.02 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{GMM} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.01 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.01 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.04 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.04 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.04 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.03 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.03 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.03 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.01 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & -0.01 \\ \cmidrule(l){2-9}
+            & \multirow{10}{*}{Agglo.} & \multirow{10}{*}{-} & 2 & asthma & 0.89 & 0 & 0 & 0.04 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.04 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.02 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.02 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.02 \\
+            &  &  & 4 & birth\_weight & 0.27 & 0 & 0 & 0.01 \\
+            &  &  & 4 & iq & 0.3 & 0 & 0 & 0.01 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.01 \\
+            &  &  & 6 & cohort & 0.22 & 0 & 0 & 0.01 \\
+            &  &  & 7 & age & 0.33 & 0 & 0.01 & 0.01 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 9]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt exposoma, dades corregides, tècniques clàssiques).
+        }
+        \label{t:results_exposome9}
+    \end{table}
+
+    \begin{table}
+        \scriptsize
+        \centering
+        \begin{tabular}{@{}ccccccccc@{}}
+            \toprule
+            \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} \\ \midrule
+            \multirow{11}{*}{DEC} & \multirow{11}{*}{DEC} & \multirow{11}{*}{K-Means} & 2 & asthma & 0.89 & 0 & 0 & 0.81 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.81 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.67 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.67 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.67 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.57 \\
+            &  &  & 4 & iq & 0.31 & 0 & 0 & 0.57 \\
+            &  &  & 4 & behaviour & 0.28 & 0 & 0 & 0.57 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.57 \\
+            &  &  & 6 & cohort & 0.21 & 0 & 0 & 0.58 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.59 \\ \midrule
+            \multirow{11}{*}{VaDE} & \multirow{11}{*}{VaDE} & \multirow{11}{*}{GMM} & 2 & asthma & 0.89 & 0 & 0 & 0.42 \\
+            &  &  & 2 & sex & 0.53 & 0 & 0 & 0.42 \\
+            &  &  & 3 & education & 0.51 & 0 & 0 & 0.27 \\
+            &  &  & 3 & native & 0.84 & 0 & 0 & 0.27 \\
+            &  &  & 3 & parity & 0.45 & 0 & 0 & 0.27 \\
+            &  &  & 4 & birth\_weight & 0.28 & 0 & 0 & 0.2 \\
+            &  &  & 4 & iq & 0.3 & 0.01 & 0 & 0.2 \\
+            &  &  & 4 & behaviour & 0.27 & 0 & 0 & 0.2 \\
+            &  &  & 4 & bmi & 0.69 & 0 & 0 & 0.2 \\
+            &  &  & 6 & cohort & 0.22 & 0 & 0 & 0.08 \\
+            &  &  & 7 & age & 0.32 & 0 & 0 & 0.39 \\ \bottomrule
+        \end{tabular}
+        \caption[Exposome Data Challenge Event: resultats - part 10]{
+            Resultats obtinguts sobre el conjunt de dades Exposome Data Challenge Event
+            (subcojunt exposoma, dades corregides, tècniques de \textit{deep clustering}).
+        }
+        \label{t:results_exposome10}
+    \end{table}
+
+
+\chapter{Dades privades: resultats complets}
+
+    \section{Gràfiques radials}
+
+    Representació gràfica de la distribució multivariant
+    de les dades del covariables,
+    segons dels clústers trobats:
+
+    \includegraphics[width=\textwidth]{private_dataset/radialplots/covariates.png}
+
+    Representació gràfica de la distribució multivariant
+    de les dades de les variables amb major variància,
+    segons dels clústers trobats:
+
+    \includegraphics[width=\textwidth]{private_dataset/radialplots/most_var_feat.png}
+
 %
 %
 %\chapter{Exemple d'annex}
