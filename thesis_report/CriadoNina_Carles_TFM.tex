@@ -27,10 +27,11 @@
             \makeglossaries
             % Define acronyms:
             \newacronym{tfm}{TFM}{treball de final de màster}
+            \newacronym{privades}{DCH-NG}{\textit{Diet, Cancer and Health - Next Generations}}
 
-            \newacronym{cq}{CQ}{qualitat de \textit{clustering} (\textit{clustering quality})}
+            \newacronym{qc}{QC}{qualitat de \textit{clustering}}
             \newacronym{fl}{FL}{aprenentatge de característiques \textit{(feature learning)}}
-            \newacronym{rl}{RL}{capa de representació \textit{(representation layer)}}
+            \newacronym{cr}{CR}{capa de representació}
             \newacronym{lf}{LF}{característiques apreses \textit{(learned features)}}
 
             \newacronym{pca}{PCA}{anàlisi de components principals}
@@ -52,8 +53,8 @@
             \newacronym{aae}{AAE}{\textit{adversarial autoencoder}}
             \newacronym{dae}{DAE}{\textit{denoising autoencoder}}
             \newacronym{sae}{SAE}{\textit{stacked autoencoder}}
-            \newacronym{dec}{DEC}{Deep embedded clustering}
-            \newacronym{vade}{VaDE}{Variational Deep Embedding}
+            \newacronym{dec}{DEC}{\textit{Deep embedded clustering}}
+            \newacronym{vade}{VaDE}{\textit{Variational Deep Embedding}}
 
             \newacronym{relu}{ReLU}{unitat lineal rectificada, (\textit{rectified linear unit})}
             \glsunset{relu}
@@ -167,10 +168,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 \label{s:intro}
     %Aquesta plantilla es concep com una guia per a l’estudiant. Es pot adaptar a les necessitats de cada treball, sempre que el/la tutor/a del treball hi estigui d’acord.
 
-\todo{ESCRIURE ABSTRACT!
-
-    REFERÈNCIA DADES PRIVADES!!!
-}
+\todo{ESCRIURE ABSTRACT!}
 
     \section{Context i justificació del treball}
     \label{s:contect}
@@ -489,17 +487,24 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         i avaluar els resultats.
 
     \paragraph{\Cref{c:resultats} \nameref{c:resultats}}
-        A continuació
+        En aquest capítol
         es presenten els resultats obtinguts
         i se'n fa un breu resum.
         La totalitat dels resultats
-        es presenten en taules i figures als corresponents annexos.
-
-\todo{Revisar si això és correcte. Referenciar annexos corresponents.}
+        es presenten en taules i figures als corresponents apèndixs.
 
     \paragraph{\Cref{c:discussio} \nameref{c:discussio}}
-\ \newline
-\todo{Resumir la discussió...}
+        Seguidament es discuteixen els resultats.
+        S'ha trobat que el model \gls{vae}
+        no propícia una bona \gls{qc},
+        però els models \gls{dec} i \gls{vade}
+        milloren el rendiment de les tècniques clàssiques
+        sobre el conjunt de dades \gls{mnist}.
+        Sobre les dades metabolòmiques,
+        l'anàlisi resulta molt més complexe
+        i cap dels models sembla obtenir un rendiment massa bo.
+        Malgrat això,
+        hi ha bastant solapament entre els clústers trobats per les diferents tècniques.
 
     \paragraph{\Cref{c:economic} \nameref{c:economic}}
         En aquest capítol es resumeix breument
@@ -507,8 +512,12 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         el desenvolupament d'aquest \gls{tfm}.
 
     \paragraph{\Cref{c:conclusions} \nameref{c:conclusions}}
-\ \newline
-\todo{Resumir les conclusions...}
+        Finalment,
+        es presenta de manera sintetitzada les conclusions
+        que s'han tret d'aquest \gls{tfm}
+        i es fa una sèrie de propostes
+        per futurs treballs,
+        que no ha donat temps d'estudiar en el temps disponible.
 
     \glsunset{fl}
 
@@ -550,16 +559,16 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         Un dels problemes que apareix habitualment al analitzar dades bioinformàtiques és la seva elevada dimensionalitat, característica que fa que les tècniques de \textit{clustering} clàssiques no funcionin bé \citep{Masood2015, Karim2021}. Per combatre aquest problema, una solució és aplicar tècniques de reducció de la dimensionalitat i posteriorment aplicar les tècniques de \textit{clustering} sobre les dades transformades \citep{Min2018, Masood2015}.
 
-        La reducció de la dimensionalitat s'aconsegueix mitjançant tècniques d'\gls{fl}. L'objectiu d'aquestes tècniques és representar les dades originals en un espai dimensional inferior, aplicant una transformació que retingui el màxim d'informació. L'espai reduït resultant s'anomena \gls{rl} i les seves dimensions \gls{lf}.
+        La reducció de la dimensionalitat s'aconsegueix mitjançant tècniques d'\gls{fl}. L'objectiu d'aquestes tècniques és representar les dades originals en un espai dimensional inferior, aplicant una transformació que retingui el màxim d'informació. L'espai reduït resultant s'anomena \gls{cr} i les seves dimensions \gls{lf}.
 
         Històricament s'han utilitzat tècniques matemàtiques per realitzar \gls{fl}, que poden ser transformacions lineals (anàlisi de components principals) o no lineals (mètodes kernel o tècniques espectrals). Posteriorment s'apliquen les tècniques de clustering sobre les \gls{lf}.
 
-        Una limitació dels mètodes lineals és que no són capaços de retenir informació sobre relacions no lineals en les dades, el que provoca una reducció de la \gls{cq}. Les tècniques no lineals són més adequades \citep{Karim2021}.
+        Una limitació dels mètodes lineals és que no són capaços de retenir informació sobre relacions no lineals en les dades, el que provoca una reducció de la \gls{qc}. Les tècniques no lineals són més adequades \citep{Karim2021}.
 
     \section{Tècniques de \textit{deep clustering}}
     \label{s:state_deep}
 
-        Les xarxes neuronals profundes possibiliten aplicar tècniques de \gls{fl} més eficients que les descrites a la secció anterior, aplicant mètodes no lineals complexes que permeten capturar \gls{lf} més rellevants. En particular, la funció de transformació es pot optimitzar mitjançant l'aprenentatge dels paràmetres de la xarxa, el que permet extreure \gls{lf} òptimes per obtenir una bona \gls{cq} \citep{Karim2021}.
+        Les xarxes neuronals profundes possibiliten aplicar tècniques de \gls{fl} més eficients que les descrites a la secció anterior, aplicant mètodes no lineals complexes que permeten capturar \gls{lf} més rellevants. En particular, la funció de transformació es pot optimitzar mitjançant l'aprenentatge dels paràmetres de la xarxa, el que permet extreure \gls{lf} òptimes per obtenir una bona \gls{qc} \citep{Karim2021}.
 
         La seva recent popularització ha fet possible desenvolupar un gran nombre de tècniques de \textit{clustering} basades en \textit{deep learning}, anomenades en conjunt tècniques de \textit{deep clustering}. Es poden dividir en dos grans grups: mètodes de dos passos, que es basen en utilitzar tècniques de \gls{fl} i aplicar mètodes de \textit{clustering} convencionals sobre les \gls{lf}; i mètodes d'un sol pas que desenvolupen un model de \textit{clustering} sobre les dades originals \citep{Karim2021}.
 
@@ -577,15 +586,15 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         L'arquitectura \gls{ae} està formada per dues parts: un codificador i un descodificador. La funció del codificador és representar l'entrada en un espai dimensional reduït, sovint un vector, anomenat codi. La funció del descodificador és reconstruir l'entrada original a partir del codi.
 
-        Optimitzant els paràmetres d'ambdues parts conjuntament durant l'entrenament de la xarxa es busca aconseguir que el codificador sigui capaç de comprimir la entrada mantenint el màxim d'informació. Aplicant la idea de \gls{fl}, el codi esdevé la \gls{rl}.
+        Optimitzant els paràmetres d'ambdues parts conjuntament durant l'entrenament de la xarxa es busca aconseguir que el codificador sigui capaç de comprimir la entrada mantenint el màxim d'informació. Aplicant la idea de \gls{fl}, el codi esdevé la \gls{cr}.
 
-        Per aconseguir un \textit{clustering} eficaç, no és suficient amb aquesta optimització ja que si no s'aplica cap restricció a la \gls{rl} podria donar lloc a \gls{lf} que no permeten una bona \gls{cq}. Per resoldre aquest problema es defineixen dos tipus de funció de cost, que s'optimitzen conjuntament durant l'entrenament \citep{Min2018}:
+        Per aconseguir un \textit{clustering} eficaç, no és suficient amb aquesta optimització ja que si no s'aplica cap restricció a la \gls{cr} podria donar lloc a \gls{lf} que no permeten una bona \gls{qc}. Per resoldre aquest problema es defineixen dos tipus de funció de cost, que s'optimitzen conjuntament durant l'entrenament \citep{Min2018}:
         \begin{itemize}
-            \item La \textbf{funció de cost auxiliar}, que depèn de la capacitat del codificador d'obtenir una \gls{rl} eficient que permeti que el descodificador sigui capaç de regenerar l'entrada. Garanteix obtenir \gls{lf} rellevants.
-            \item La \textbf{funció de cost de \textit{clustering}}, que depèn de l'algoritme de \textit{clustering} i de que les \gls{lf} obtingudes siguin adequades per realitzar \textit{clustering}. Assegura obtenir una bona \gls{cq}.
+            \item La \textbf{funció de cost auxiliar}, que depèn de la capacitat del codificador d'obtenir una \gls{cr} eficient que permeti que el descodificador sigui capaç de regenerar l'entrada. Garanteix obtenir \gls{lf} rellevants.
+            \item La \textbf{funció de cost de \textit{clustering}}, que depèn de l'algoritme de \textit{clustering} i de que les \gls{lf} obtingudes siguin adequades per realitzar \textit{clustering}. Assegura obtenir una bona \gls{qc}.
         \end{itemize}
 
-        L'aproximació més bàsica de l'arquitectura \gls{ae} es pot construir utilitzant \glspl{mlp} simètrics pel codificador i descodificador. Encara que és fàcil d'implementar, el model generat conté un gran nombre d'hiperparàmetres i esdevé difícil d'optimitzar i balancejar les dues funcions de cost \citep{Karim2021}. A més, no s'aplica cap restricció a la funció de representació i per tant no garanteix obtenir una bona \gls{cq}.
+        L'aproximació més bàsica de l'arquitectura \gls{ae} es pot construir utilitzant \glspl{mlp} simètrics pel codificador i descodificador. Encara que és fàcil d'implementar, el model generat conté un gran nombre d'hiperparàmetres i esdevé difícil d'optimitzar i balancejar les dues funcions de cost \citep{Karim2021}. A més, no s'aplica cap restricció a la funció de representació i per tant no garanteix obtenir una bona \gls{qc}.
 
         A la literatura s'han descrit diferents aproximacions a la idea del \gls{ae}, que prenen com a base altres arquitectures. Algunes d'aquestes aproximacions permeten aconseguir un model generatiu, que és capaç de generar dades similars a les d'entrenament. Alguns d'aquestes aproximacions són:
 
@@ -638,7 +647,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     Això li atorga al model certa robustesa estadística
     que no trobem en altres arquitectures.
     A més,
-    la \gls{rl} apresa permet la generació de mostres artificials
+    la \gls{cr} apresa permet la generació de mostres artificials
     similars a les dades d'entrenament.
     Això últim pot resultar útil com a tècnica d'augment de dades.
 
@@ -661,7 +670,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         en un espai dimensional reduït $\mathbf{z}$
         aplicant una transformació no lineal.
         Des de la perspectiva de \gls{fl},
-        aquest espai reduït es correspon amb la \gls{rl}.
+        aquest espai reduït es correspon amb la \gls{cr}.
         El descodificador aprèn a reconstruir $\mathbf{x}$ a partir de $\mathbf{z}$
         aplicant una segona transformació no lineal.
         L'entrenament de les dues parts conjuntament
@@ -1011,7 +1020,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         i un descodificador capaç de generar mostres simulades
         a partir de $\mathbf{z}$.
         És a dir, el model ha après unes \gls{lf} rellevants de les dades
-        que permeten obtenir una \gls{rl} eficient.
+        que permeten obtenir una \gls{cr} eficient.
 
         El següent pas és aplicar una tècnica de \textit{clustering}
         sobre les representacions de l'espai latent $\mathbf{z}$.
@@ -1035,7 +1044,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         i una distribució auxiliar $P$.
         Escollint una distribució auxiliar adequada,
         al minimitzar aquesta distància
-        s'aconsegueix millorar la \gls{cq}:
+        s'aconsegueix millorar la \gls{qc}:
         es minimitza la distància de cada punt al seu centroide
         alhora que es maximitza la distància a la resta de centroides.
 
@@ -1068,8 +1077,8 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         Finalment, s'entrena la xarxa utilitzant el descens de gradients estocàstic.
         El model aprendrà una nova representació en l'espai latent $\mathbf{z}$,
         juntament amb una posició òptima dels centroides que defineixen cada clúster,
-        que en conjunt optimitzin la \gls{cq}
-        mantenint unes \gls{lf} rellevants a la \gls{rl}.
+        que en conjunt optimitzin la \gls{qc}
+        mantenint unes \gls{lf} rellevants a la \gls{cr}.
 
         \begin{figure}
             \centering
@@ -1088,7 +1097,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     \section{Mètriques d'avaluació}
     \label{s:metrics}
 
-        Per validar la \gls{cq}
+        Per validar la \gls{qc}
         s'han utilitzat dos tipus de mètriques:
         validació externa i validació interna.
         Les mètriques de validació externa
@@ -1110,14 +1119,14 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         per tant s'han pogut utilitzar també mètriques de validació externa.
 
         Cap mètrica per si sola és eficaç
-        per avaluar la \gls{cq} \cite{Palacio-Nino2019},
+        per avaluar la \gls{qc} \cite{Palacio-Nino2019},
         de manera que s'han seleccionat quatre mètriques:
         una basada en validació interna
         i tres basades en validació externa.
         Es descriuen a continuació:
 
         \paragraph{Mètriques de validació interna}
-            La \gls{cq} es pot mesurar en funció de
+            La \gls{qc} es pot mesurar en funció de
             la cohesió
             (la proximitat entre els elements dins d'un mateix clúster),
             i el nivell de separació entre els diferents clústers.
@@ -1196,7 +1205,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
 
         \paragraph{Mètriques de validació externa}
             Si es té una partició de referència $P$,
-            la \gls{cq} es pot mesurar comparant-la
+            la \gls{qc} es pot mesurar comparant-la
             amb els clústers $C$ resultants de l'algoritme de \textit{clustering}.
             Es construeix un taula de contingència
             i es comparen les parelles d'observacions
@@ -1350,12 +1359,20 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         que contenen dades a tots els conjunts de dades.
         En total, es disposa de 1152 observacions.
 
-    \paragraph{Dades metabolòmiques privades}
-        En tercer lloc, s'ha utilitzat un conjunt de dades metabolòmiques
-        facilitat per un equip privat,
-        provinents d'un estudi clínic
-        on es pretén relacionar les expressions metabolòmiques
-        amb diversos indicadors de salut.
+    \paragraph{Dades \acrshort{privades}}
+        En tercer lloc,
+        s'ha utilitzat un conjunt de dades metabolòmiques
+        facilitat pel grup de recerca
+        \textit{Biomarkers and Nutritional \& Food Metabolomics}\footnote{\url{http://www.nutrimetabolomics.com/}},
+        del Departament de Nutrició, Ciències de l'Alimentació i Gastronomia
+        de la Universitat de Barcelona\footnote{\url{https://www.ub.edu/web/ub/ca/universitat/campus_fac_dep/departaments/n/depnutricioCAiG.html?}}.
+
+        Les dades provenen d'un estudi clínic titulat
+        \gls{privades} \citep{Petersen2022},
+        que pretén desenvolupar tècniques innovadores
+        per estudiar la relació entre els gens, la dieta i l'estil de vida
+        amb càncer i altres malalties,
+        aplicant una perspectiva trans-generacional.
 
         Es tracta d'un conjunt de 1120 observacions
         sobre 411 metabòlits
@@ -1366,12 +1383,10 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         i la resta numèriques
         (edat i diversos indicadors de salut).
 
-        L'entitat que ha proveït les dades
+        L'equip de recerca que ha proveït les dades
         ha anonimitzat la identitat dels pacients
-        i no permet la publicació de les dades
+        i ha prohibit expressament la publicació de les dades
         per protegir la seva confidencialitat.
-
-\todo{Referenciar font dades privades.}
 
 
 
@@ -1390,6 +1405,8 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     Per cada conjunt de dades,
     s'han seguit els següents passos
     amb algunes variacions que s'expliquen a continuació.
+    A la \cref{t:metodes_resum} es resumeixen totes les tècniques
+    avaluades per cada conjunt de dades.
 
     \paragraph{Seleccionar classes de referència}
         Primerament s'ha seleccionat una o diverses variables categòriques independents,
@@ -1471,9 +1488,40 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         (originals o transformades, segons la tècnica utilitzada)
         en un núvol de punts de dues dimensions
         mitjançant la tècnica \gls{tsne},
-        assignant un color diferent a cada clúster.
+        assignant un color diferent a cada clúster (\cref{f:ex_tsne}).
 
-        Mitjançant gràfiques radials,
+        \begin{figure}
+        \begin{minipage}[c]{0.48\textwidth}
+            \centering
+            \includegraphics[width=6cm]{exemple_tsne_vademnist.png}
+            \caption[Exemple gràfica \gls{tsne}]{
+                Exemple de gràfica \gls{tsne}
+                del model \gls{vade} entrenat sobre les dades \gls{mnist}.
+                Es representa la \gls{cr} utilitzant ls dues primers components
+                de la reducció \gls{tsne}.
+                Els colors mostren els les assignacions de clústers del model.
+            }
+            \label{f:ex_tsne}
+        \end{minipage} \hfill
+        \begin{minipage}[c]{0.48\textwidth}
+            \centering
+            \includegraphics[width=7cm]{exemple_radialplots_dchng.png}
+            \caption[Exemple gràfica radial]{
+                Exemple de gràfica radial.
+                Es representa la distribució multivariant de les covariables
+                del conjunt de dades \gls{privades}
+                en funció de les assignacions de clústers
+                trobades pel model \gls{dec},
+                fixant el número de clústers a 2 i 3.
+                Cada radi del diagrama representa una variable,
+                i els polígons del centre representen la distribució multivariant que pren cada clúster,
+                on cada vèrtex és la mitjana dels valors per cada variable.
+            }
+            \label{f:ex_radial}
+        \end{minipage}
+        \end{figure}
+
+        Mitjançant gràfiques radials  (\cref{f:ex_radial}),
         s'ha representat la distribució multivariant
         de les variables independents
         pels clústers trobats amb cada combinació de tècnica i nombre de clústers.
@@ -1482,17 +1530,31 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         i s'ha representat la seva distribució multivariant
         pels diferents clústers de la mateixa manera.
 
+
+
         Per últim,
         s'han comparat entre elles les assignacions de clústers de cada un dels mètodes
-        mitjançant un gràfic tipus \textit{heatmap},
+        mitjançant un gràfic tipus \textit{heatmap}  (\cref{f:ex_heatmap}),
         on cada fila representa una de les tècniques avaluades,
-        les columnes representen les observacions del dataset,
+        les columnes representen les observacions del conjunt de dades,
         i el color representa l'assignació de cada mostra a un dels clústers.
 
-        A la \cref{t:metodes_resum} es resumeix totes les tècniques
-        avaluades per cada conjunt de dades.
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{exemple_heatmap_dchng.png}
+            \caption[Exemple gràfica \textit{heatmap} de les assignacions de clústers]{
+                Exemple de gràfica \textit{heatmap}
+                on es comparen els clústers trobats pels diferents mètodes
+                avaluats sobre el conjunt de dades \gls{privades}.
+                Cada fila representa una de les tècniques,
+                les columnes representen les observacions
+                i el colors representen a quin clúster s'ha assignat cada observació.
+                Per poder comparar les tècniques,
+                totes les files s'han ordenat segons el mateix índex.
+            }
+            \label{f:ex_heatmap}
+        \end{figure}
 
-\todo{Mostrar exemples de les gràfiques?}
 
         \subsection{MNIST}
         \label{s:mnist}
@@ -1719,9 +1781,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                 de les covariables
                 i de les 20 variables amb major variabilitat de cada conjunt de dades.
 
-\todo{Incloure referències als gràfics en els resultats o annexos.}
-
-        \subsection{Dades metabolòmiques privades}
+        \subsection{Dades DCH-NG}
         \label{s:dades_privades}
 
             Com a grups objectiu contra els que avaluar les mètriques
@@ -1741,7 +1801,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                     CVrisk3      & 3 & Risk de patir malalties cardiovasculars. \\
                     \bottomrule
                 \end{tabular}
-                \caption[Dades privades: covariables seleccionades]{Variables independents seleccionades del conjunt de dades privades.}
+                \caption[Dades \gls{privades}: covariables seleccionades]{Variables independents seleccionades del conjunt de dades \gls{privades}.}
                 \label{t:dadespriv_vars}
             \end{table}
 
@@ -1793,7 +1853,7 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
                 \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}\textbf{ExposomeChall.}\\ \textbf{(exposoma)}\end{tabular}} & Clàssic & Cap, PCA & K-means, GMM & - & \multirow{3}{*}{Correcció efecte lot} \\
                 & \multirow{2}{*}{\textit{Deep learning}} & DEC & DEC & K-means, GMM &  \\
                 &  & VaDE & VaDE & GMM &  \\ \midrule
-                \multirow{3}{*}{\textbf{Dades privades}} & Clàssic & Cap, PCA & K-means, GMM & - & - \\
+                \multirow{3}{*}{\textbf{Dades DCH-NG}} & Clàssic & Cap, PCA & K-means, GMM & - & - \\
                 & \multirow{2}{*}{\textit{Deep learning}} & DEC & DEC & K-means, GMM & - \\
                 &  & VaDE & VaDE & GMM & - \\ \bottomrule
             \end{tabular}
@@ -1849,170 +1909,489 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
     %    \label{fig:my_label}
     %\end{figure}
 
+    \section{MNIST}
+    \label{s:results_mnist}
 
+        A la \cref{t:results_mnist} es mostren les mètriques
+        obtingudes per cada un dels models avaluats.
+        Les tècniques clàssiques aplicades sobre les dades sense transformar
+        i sobra la transformació \gls{pca}
+        han aconseguit el mateix rendiment,
+        mentre que els models de \textit{deep clustering}
+        en general han aconseguit un rendiment notablement més elevat.
+        Això suggereix que les tècniques de \textit{deep learning}
+        són capaces de trobar relacions no lineals
+        que es perden al aplicar \gls{pca}.
 
-    \begin{table}[p]
-        \small
-        \centering
-        \begin{minipage}{\textwidth}
+        Dintre dels models de \textit{deep clustering},
+        en referència a les mètriques de validació externa
+        (és a dir, el grau de coincidència amb les etiquetes reals)
+        cap destacat que els models basats en \gls{vae}
+        són els que obtenen pitjor rendiment.
 
-        \begin{tabular}{@{}cccccccc@{}}
-            \toprule
-            \textbf{Tipus} & \textbf{\textit{Feature learning}} & \textbf{\textit{Clustering}} & \textbf{Inicialització} & \textbf{Acc} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil} \\ \midrule
-            \multirow{2}{*}{Clàssic} & \multirow{2}{*}{-} & K-means & - & 0.59 & 0.41 & 0.53 & 0.06 \\
-            &  & GMM & - & 0.44 & 0.22 & 0.34 & 0.02 \\
-            \multirow{13}{*}{\textit{Deep learning}} & \multirow{2}{*}{PCA} & K-Means & - & 0.59 & 0.41 & 0.53 & 0.09 \\
-            &  & GMM & - & 0.47 & 0.23 & 0.43 & 0.02 \\  \midrule
-            & \multirow{2}{*}{AE} & K-means & - & 0.83 & 0.69 & 0.73 & 0.19 \\
-            &  & GMM & - & 0.77 & 0.57 & 0.68 & 0.14 \\
-            & \multirow{2}{*}{DEC} & DEC & K-means & 0.83 & 0.69 & 0.74 & 0.93 \\
-            &  & DEC & GMM & 0.76 & 0.56 & 0.69 & 0.93 \\
-            & \multirow{2}{*}{VAE} & K-means & - & 0.59 & 0.41 & 0.54 & 0.16 \\
-            &  & GMM & - & 0.48 & 0.25 & 0.39 & -0.01 \\
-            & \multirow{2}{*}{VAE+DEC\textsuperscript{1}} & VAE+DEC\textsuperscript{1} & K-Means & 0.61 & 0.42 & 0.54 & 0.90 \\
-            &  & VAE+DEC\textsuperscript{1} & GMM & 0.57 & 0.31 & 0.47 & 0.87 \\
-            & \multirow{2}{*}{VAE+DEC\textsuperscript{2}} & VAE+DEC\textsuperscript{2} & K-means & 0.57 & 0.37 & 0.49 & 0.20 \\
-            &  & VAE+DEC\textsuperscript{2} & GMM & 0.59 & 0.36 & 0.49 & 0.12 \\
-            & VaDE & VaDE & GMM & 0.94 & 0.88 & 0.88 & 0.23 \\ \bottomrule
-        \end{tabular}
-        \caption[MNIST: resultats]{Resum dels resultats obtinguts sobre els conjunt de dades \gls{mnist}.
-            \newline \textsuperscript{1} Model sense descodificador i per tant sense funció de cost de reconstrucció.
-            \newline \textsuperscript{2} Model amb descodificador i funció de cost de reconstrucció.
-        }
-        \label{t:results_mnist}
-        \end{minipage}
-    \end{table}
+        Per altra banda, el model \gls{dec} pràcticament obté els mateixos resultats
+        que aplicar tècniques clàssiques a la capa de representació del \gls{ae}.
+        Això suggereix una alta dependència dels model \gls{dec}
+        en els paràmetres amb què s'inicialitza durant l'entrenament.
+        Ambdós obtenen els segons millors resultats.
 
+        Els millors resultats per les mètriques de validació externa
+        s'obtenen amb el model \gls{vade},
+        que aconsegueix una exactitud de 94\%.
 
-    \begin{table}[p]
-        \small
-        \centering
-        \begin{tabular}{@{}ccccccccc@{}}
-            \toprule
-            \begin{tabular}[c]{@{}c@{}}Modificació\\ dades\end{tabular} & Tipus & \textit{Feature learning} & \textit{Clustering} & Inicialització & Acc. & ARI & AMI & Sil. \\ \midrule
-            \multirow{13}{*}{-} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
-            &  &  & GMM & - & 0.46 & 0 & 0 & 0 \\
-            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.09 \\
-            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.05 \\
-            &  &  & GMM & - & 0.46 & 0 & 0 & 0.06 \\
-            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
-            & \multirow{7}{*}{\textit{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.54 \\
-            &  & DEC + D.A. & DEC & K-Means & 0.48 & 0 & 0 & 0.83 \\
-            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.17 \\
-            &  & VaDE + D.A. & VaDE & GMM & 0.48 & 0 & 0 & 0.19 \\
-            &  & DEC (conv. 1D) & DEC & K-Means & 0.48 & 0 & 0 & 0.69 \\
-            &  & DEC (conv. 2D) & DEC & K-Means & 0.48 & 0 & 0 & 0.46 \\
-            &  & VaDE (conv. 1D) & VaDE & GMM & 0.48 & 0 & 0 & 0.21 \\ \midrule
-            \multirow{10}{*}{\begin{tabular}[c]{@{}c@{}}Selecció de\\ variables\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.07 \\
-            &  &  & GMM & - & 0.46 & 0 & 0 & 0.05 \\
-            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.08 \\
-            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
-            &  &  & GMM & - & 0.46 & 0 & 0 & 0.05 \\
-            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
-            & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.5 \\
-            &  & DEC (D.A.) & DEC & K-Means & 0.48 & 0 & 0 & 0.77 \\
-            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.17 \\
-            &  & VaDE (D.A.) & VaDE & GMM & 0.48 & 0 & 0 & 0.28 \\ \midrule
-            \multirow{8}{*}{\begin{tabular}[c]{@{}c@{}}Correcció\\ efecte lot\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.07 \\
-            &  &  & GMM & - & 0.46 & 0 & 0 & 0.02 \\
-            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.09 \\
-            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
-            &  &  & GMM & - & 0.46 & 0 & 0 & 0.07 \\
-            &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
-            & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.49 \\
-            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.22 \\\bottomrule
+        Per últim, per la mètrica de validació interna
+        el model \gls{dec} destaca sobre la resta.
+        El model VAE+DEC on s'ha eliminat el descodificador
+        obté una puntuació similar al \gls{dec},
+        mentre que el model VAE+DEC que manté el descodificador
+        perd aquesta capacitat.
+
+        A la \cref{f:vaevadedec_comp} s'il·lustra
+        la diferència entre els clústers obtinguts pels diferents models.
+        El model \gls{vae}, encara que té certa capacitat per distingir els diferens grups,
+        té dificultats per separar-los en la \gls{cr}
+        donat que tots els punts comparteixen la mateixa distribució normal.
+        En conseqüència, els clústers aconseguits aplicant \gls{gmm}
+        mostren solapament.
+        En comparació, els models \gls{vade} i \gls{dec}
+        són capaços de separar els clústers i obtenir una millor \gls{qc}.
+
+        \begin{table}[p]
+            \small
+            \centering
+            \begin{minipage}{\textwidth}
+
+            \begin{tabular}{@{}cccccccc@{}}
+                \toprule
+                \textbf{Tipus} & \textbf{\textit{Feature learning}} & \textbf{\textit{Clustering}} & \textbf{Inicialització} & \textbf{Acc} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil} \\ \midrule
+                \multirow{2}{*}{Clàssic} & \multirow{2}{*}{-} & K-means & - & 0.59 & 0.41 & 0.53 & 0.06 \\
+                &  & GMM & - & 0.44 & 0.22 & 0.34 & 0.02 \\
+                \multirow{13}{*}{\textit{Deep learning}} & \multirow{2}{*}{PCA} & K-Means & - & 0.59 & 0.41 & 0.53 & 0.09 \\
+                &  & GMM & - & 0.47 & 0.23 & 0.43 & 0.02 \\  \midrule
+                & \multirow{2}{*}{AE} & K-means & - & 0.83 & 0.69 & 0.73 & 0.19 \\
+                &  & GMM & - & 0.77 & 0.57 & 0.68 & 0.14 \\
+                & \multirow{2}{*}{DEC} & DEC & K-means & 0.83 & 0.69 & 0.74 & 0.93 \\
+                &  & DEC & GMM & 0.76 & 0.56 & 0.69 & 0.93 \\
+                & \multirow{2}{*}{VAE} & K-means & - & 0.59 & 0.41 & 0.54 & 0.16 \\
+                &  & GMM & - & 0.48 & 0.25 & 0.39 & -0.01 \\
+                & \multirow{2}{*}{VAE+DEC\textsuperscript{1}} & VAE+DEC\textsuperscript{1} & K-Means & 0.61 & 0.42 & 0.54 & 0.90 \\
+                &  & VAE+DEC\textsuperscript{1} & GMM & 0.57 & 0.31 & 0.47 & 0.87 \\
+                & \multirow{2}{*}{VAE+DEC\textsuperscript{2}} & VAE+DEC\textsuperscript{2} & K-means & 0.57 & 0.37 & 0.49 & 0.20 \\
+                &  & VAE+DEC\textsuperscript{2} & GMM & 0.59 & 0.36 & 0.49 & 0.12 \\
+                & VaDE & VaDE & GMM & 0.94 & 0.88 & 0.88 & 0.23 \\ \bottomrule
             \end{tabular}
-        \caption[Exposome Data Challenge Event: resultats (metaboloma)]{
-            Resum dels resultats obtinguts sobre el subcojunt de dades metabolòmiques
-            del conjunt de dades Exposome Data Challenge Event
-            (les puntuacions són la mitjana per tots els números de clústers avaluats).}
-        \label{t:metabol_results}
-    \end{table}
+            \caption[MNIST: resultats]{Resum dels resultats obtinguts sobre els conjunt de dades \gls{mnist}.
+                \newline \textsuperscript{1} Model sense descodificador i per tant sense funció de cost de reconstrucció.
+                \newline \textsuperscript{2} Model amb descodificador i funció de cost de reconstrucció.
+            }
+            \label{t:results_mnist}
+            \end{minipage}
+        \end{table}
 
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{mnist/tsne_embeddings/vae_vade_dec_comparison.png}
+            \caption[Comparació dels models \gls{vae}, \gls{vade} i \gls{dec}]{
+                Comparació dels models \gls{vae} + \gls{gmm} (esquerra), \gls{vade} (centre) i \gls{dec} (dreta).
+                Representació \gls{tsne} de la \gls{cr} dels models.
+                Els colors dels punts representen l'assignació a diferents clústers.
+            }
+            \label{f:vaevadedec_comp}
+        \end{figure}
+
+
+    \section{Exposome Data Challenge Event}
+    \label{s:results_exposome}
+
+        Les mètriques de validació mesurades en aquest conjunt de dades
+        han resultat poc informatives.
+        S'ha trobat que tots els models han aconseguit
+        un solapament gairebé perfecte
+        amb la covariable \textit{cohort},
+        suggerint un fort efecte lot en les dades.
+
+        No obstant,
+        tot i aplicant una tècnica per corregir per aquest efecte,
+        no s'ha trobat una relació clara entre els clústers
+        i les covariables estudiades.
+
+        Els mètodes addicionals que s'han estudiat
+        (models convolucionals,
+        selecció de variables amb més variació,
+        augment artificial de les dades)
+        no han aconseguit una millora en el rendiment.
+
+        De nou, s'observa que el mètode \gls{dec}
+        aconsegueix destacar-se reiteradament en quant a la mètrica silueta.
+
+        A les \cref{t:metabol_results,t:exposome_results} es mostra
+        per cada tècnica
+        la mitjana de les mètriques obtingudes
+        sobre els diferents números de clústers fixats.
+        Els resultats complets s'adjunten al \cref{a:exposome}.
+
+        Al comparar els clústers trobats per les diferents tècniques,
+        s'observa un bon nivell de solapament entre totes les tècniques,
+        amb l'excepció de \gls{gmm} aplicada sobre la transformació \gls{pca},
+        que sembla trobar una estructura alternativa.
+
+        A la \cref{f:expsome_heatmap} es mostra la comparació dels clústers
+        trobats per les diferents tècniques avaluades
+        sobre subconjunt de dades metabolòmiques corregides per l'efecte de lot.
+        La resta de gràfiques s'adjunte al \cref{a:exposome}.
+
+        Finalment,
+        respecte a la distribució multivariant de les covariables,
+        s'observa una possible distribució diferencial en funció dels lots
+        que podria ser indicativa d'una interpretació biològica,
+        però seria necessari un estudi multivariant posterior
+        per treure'n conclusions.
+
+        La distribució multivariant de les variables amb més variació
+        no sembla mostrar una distribució diferencial en funció dels clústers,
+        però com s'ha indicat abans caldria estudiar-ho amb més profunditat.
+
+        A la \cref{expsome_radialplot} es mostra la distribució diferencial
+        de les variables fenotípiques
+        en funció dels clústers trobats pels diferents mètodes,
+        fixant el número de clústers a 4.
+        La resta de gràfiques s'adjunte al \cref{a:exposome}.
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/metabol_corrected.png}
+            \caption[Comparació dels clústers pel conjunt de dades Exposome Data Challenge Event]{
+                Comparació dels clústers trobats pels diferents mètodes avaluats
+                sobre el conjunt de dades Exposome Data Challenge Event,
+                subconjunt dades metabolòmiques corregides per l'efecte de lot.
+                S'observa un bon nivell de solapament entre totes les tècniques,
+                excepte \gls{pca} + \gls{gmm} que sembla trobar una estructura alternativa.
+            }
+            \label{f:expsome_heatmap}
+        \end{figure}
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/metab_corr_covars_k4.png}
+            \caption[Distribució diferencial de les variables fenotip a Exposome Data Challenge Event]{
+                Representació de la distribució diferencial
+                de les variables fenotípiques al conjunt de dades Exposome Data Challenge Event
+                en funció dels clústers trobats pels diferents mètodes,
+                fixant el número de clústers a 4.
+            }
+            \label{f:expsome_radialplot}
+        \end{figure}
 
         \begin{table}[p]
             \small
             \centering
             \begin{tabular}{@{}ccccccccc@{}}
-            \toprule
-            \begin{tabular}[c]{@{}c@{}}Modificació\\ dades\end{tabular}  & Tipus & \textit{Feature learning} & \textit{Clustering} & Inicialització & Acc. & ARI & AMI & Sil. \\ \midrule
-            \multirow{8}{*}{-} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.6 & 0.17 & 0.18 & 0.13 \\
-            &  &  & GMM & - & 0.59 & 0.16 & 0.18 & 0.11 \\
-            &  &  & K-Means & - & 0.59 & 0.16 & 0.18 & 0.13 \\
-            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.6 & 0.17 & 0.18 & 0.1 \\
-            &  &  & GMM & - & 0.59 & 0.17 & 0.19 & 0.1 \\
-            &  &  & K-Means & - & 0.59 & 0.16 & 0.18 & 0.1 \\
-            & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.6 & 0.16 & 0.17 & 0.79 \\
-            &  & VaDE & VaDE & GMM & 0.58 & 0.12 & 0.14 & 0.45 \\ \midrule
-            \multirow{8}{*}{\begin{tabular}[c]{@{}c@{}}Correcció\\ efecte lot\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.02 \\
-            &  &  & GMM & - & 0.46 & 0 & 0 & 0.02 \\
-            &  &  & K-Means & - & 0.47 & 0 & 0 & 0.03 \\
-            &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.02 \\
-            &  &  & GMM & - & 0.49 & 0.02 & 0.02 & 0 \\
-            &  &  & K-Means & - & 0.47 & 0 & 0 & 0.02 \\
-            & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.64 \\
-            &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.27 \\ \bottomrule
-        \end{tabular}
-        \caption[Exposome Data Challenge Event: resultats (exposoma)]{
-            Resum dels resultats obtinguts sobre el subcojunt de dades de l'exposoma
-            del conjunt de dades Exposome Data Challenge Event
-            (les puntuacions són la mitjana per tots els números de clústers avaluats).}
-        \label{t:exposome_results}
-    \end{table}
+                \toprule
+                \begin{tabular}[c]{@{}c@{}}Modificació\\ dades\end{tabular} & Tipus & \textit{Feature learning} & \textit{Clustering} & Inicialització & Acc. & ARI & AMI & Sil. \\ \midrule
+                \multirow{13}{*}{-} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
+                &  &  & GMM & - & 0.46 & 0 & 0 & 0 \\
+                &  &  & K-Means & - & 0.46 & 0 & 0 & 0.09 \\
+                &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.05 \\
+                &  &  & GMM & - & 0.46 & 0 & 0 & 0.06 \\
+                &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
+                & \multirow{7}{*}{\textit{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.54 \\
+                &  & DEC + D.A. & DEC & K-Means & 0.48 & 0 & 0 & 0.83 \\
+                &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.17 \\
+                &  & VaDE + D.A. & VaDE & GMM & 0.48 & 0 & 0 & 0.19 \\
+                &  & DEC (conv. 1D) & DEC & K-Means & 0.48 & 0 & 0 & 0.69 \\
+                &  & DEC (conv. 2D) & DEC & K-Means & 0.48 & 0 & 0 & 0.46 \\
+                &  & VaDE (conv. 1D) & VaDE & GMM & 0.48 & 0 & 0 & 0.21 \\ \midrule
+                \multirow{10}{*}{\begin{tabular}[c]{@{}c@{}}Selecció de\\ variables\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.07 \\
+                &  &  & GMM & - & 0.46 & 0 & 0 & 0.05 \\
+                &  &  & K-Means & - & 0.46 & 0 & 0 & 0.08 \\
+                &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
+                &  &  & GMM & - & 0.46 & 0 & 0 & 0.05 \\
+                &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
+                & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.5 \\
+                &  & DEC (D.A.) & DEC & K-Means & 0.48 & 0 & 0 & 0.77 \\
+                &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.17 \\
+                &  & VaDE (D.A.) & VaDE & GMM & 0.48 & 0 & 0 & 0.28 \\ \midrule
+                \multirow{8}{*}{\begin{tabular}[c]{@{}c@{}}Correcció\\ efecte lot\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.07 \\
+                &  &  & GMM & - & 0.46 & 0 & 0 & 0.02 \\
+                &  &  & K-Means & - & 0.46 & 0 & 0 & 0.09 \\
+                &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.06 \\
+                &  &  & GMM & - & 0.46 & 0 & 0 & 0.07 \\
+                &  &  & K-Means & - & 0.46 & 0 & 0 & 0.07 \\
+                & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.49 \\
+                &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.22 \\\bottomrule
+                \end{tabular}
+            \caption[Exposome Data Challenge Event: resultats (metaboloma)]{
+                Resum dels resultats obtinguts sobre el subcojunt de dades metabolòmiques
+                del conjunt de dades Exposome Data Challenge Event
+                (les puntuacions són la mitjana per tots els números de clústers avaluats).}
+            \label{t:metabol_results}
+        \end{table}
 
-    \begin{sidewaystable}[p]
-        \small
-        \centering
-        \begin{tabular}{@{}lllllllllll@{}}
-            \toprule
-            \textbf{Tipus} & \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} & \textbf{\begin{tabular}[c]{@{}l@{}}Mateix\\ clúst.\end{tabular}} \\ \midrule
-            \multirow{18}{*}{Clàssic} & \multirow{6}{*}{-} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.25 & 0.47 \\
-            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.09 & 0.21 \\
-            &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0 & 0 & 0.17 & 0.33 \\
-            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.1 & 0.17 \\
-            &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.24 & 0.46 \\
-            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.11 & 0.18 \\
-            & \multirow{6}{*}{PCA} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.29 & 0.47 \\
-            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.12 & 0.2 \\
-            &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0.01 & 0.01 & 0.14 & 0.24 \\
-            &  &  & - & 3 & CVrisk3 & 0.37 & 0 & 0 & 0.02 & 0.12 \\
-            &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.38 & 0.75 \\
-            &  &  & - & 3 & CVrisk3 & 0.35 & 0 & 0 & 0.1 & 0.24 \\
-            & \multirow{6}{*}{\begin{tabular}[c]{@{}l@{}}Selecció \\ de variables\\ +\\ PCA\end{tabular}} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.32 & 0.48 \\
-            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.14 & 0.2 \\
-            &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0.01 & 0.01 & 0.16 & 0.25 \\
-            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.02 & 0.14 \\
-            &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.28 & 0.41 \\
-            &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.22 & 0.39 \\
-            \multirow{4}{*}{\textit{\begin{tabular}[c]{@{}l@{}}Deep\\ clustering\end{tabular}}} & \multirow{2}{*}{DEC} & DEC & K-Means & 2 & gender & 0.55 & 0 & 0 & 0.96 & 0.35 \\
-            &  & DEC & K-Means & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.93 & 0.15 \\
-            & \multirow{2}{*}{VaDE} & VaDE & GMM & 2 & gender & 0.55 & 0 & 0 & 0.57 & 0.3 \\
-            &  & VaDE & GMM & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.45 & 0.2 \\ \bottomrule
-        \end{tabular}
-        \caption[Dades privades: resultats]{Resum dels resultats obtinguts sobre el cojunt de dades metabolòmiques privades}
-        \label{t:dadespriv_results}
-    \end{sidewaystable}
+        \begin{table}[p]
+                \small
+                \centering
+                \begin{tabular}{@{}ccccccccc@{}}
+                \toprule
+                \begin{tabular}[c]{@{}c@{}}Modificació\\ dades\end{tabular}  & Tipus & \textit{Feature learning} & \textit{Clustering} & Inicialització & Acc. & ARI & AMI & Sil. \\ \midrule
+                \multirow{8}{*}{-} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.6 & 0.17 & 0.18 & 0.13 \\
+                &  &  & GMM & - & 0.59 & 0.16 & 0.18 & 0.11 \\
+                &  &  & K-Means & - & 0.59 & 0.16 & 0.18 & 0.13 \\
+                &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.6 & 0.17 & 0.18 & 0.1 \\
+                &  &  & GMM & - & 0.59 & 0.17 & 0.19 & 0.1 \\
+                &  &  & K-Means & - & 0.59 & 0.16 & 0.18 & 0.1 \\
+                & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.6 & 0.16 & 0.17 & 0.79 \\
+                &  & VaDE & VaDE & GMM & 0.58 & 0.12 & 0.14 & 0.45 \\ \midrule
+                \multirow{8}{*}{\begin{tabular}[c]{@{}c@{}}Correcció\\ efecte lot\end{tabular}} & \multirow{6}{*}{Clàssic} & \multirow{3}{*}{PCA} & Agglo. & - & 0.46 & 0 & 0 & 0.02 \\
+                &  &  & GMM & - & 0.46 & 0 & 0 & 0.02 \\
+                &  &  & K-Means & - & 0.47 & 0 & 0 & 0.03 \\
+                &  & \multirow{3}{*}{Raw data} & Agglo. & - & 0.46 & 0 & 0 & 0.02 \\
+                &  &  & GMM & - & 0.49 & 0.02 & 0.02 & 0 \\
+                &  &  & K-Means & - & 0.47 & 0 & 0 & 0.02 \\
+                & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Deep\\ clustering\end{tabular}} & DEC & DEC & K-Means & 0.48 & 0 & 0 & 0.64 \\
+                &  & VaDE & VaDE & GMM & 0.48 & 0 & 0 & 0.27 \\ \bottomrule
+            \end{tabular}
+            \caption[Exposome Data Challenge Event: resultats (exposoma)]{
+                Resum dels resultats obtinguts sobre el subcojunt de dades de l'exposoma
+                del conjunt de dades Exposome Data Challenge Event
+                (les puntuacions són la mitjana per tots els números de clústers avaluats).}
+            \label{t:exposome_results}
+        \end{table}
+
+    \section{Dades DCH-NG}
+    \label{s:results_privades}
+
+        Ne nou, les mètriques de validació mesurades en aquest conjunt de dades
+        han resultat poc informatives:
+        cap dels mètodes ha aconseguit un bon rendiment
+        respecte a les mètriques de validació externes.
+        Respecte a la mètrica silueta,
+        de nou el model \gls{dec} destaca significativament.
+
+        Encara que els clústers obtinguts no mostren correlació
+        amb les covariables categòriques preses com a referència,
+        sí mostren un alt nivell de solapament
+        entre les diferents tècniques (\cref{f:dchng_heatmap}).
+
+        Respecte a la distribució multivariant de les covariables (\cref{f:dchng_radial_covars}),
+        sembla que els grups trobats per les tècniques
+        basades en \gls{kmeans} es relacionen amb valors més o menys elevats dels indicadors de salut
+        (variables numèriques),
+        mentre que les basades en \gls{gmm},
+        a més contrasten aquests valors contra la variable \textit{gènere}.
+
+        En quant a la distribució multivariant de les variables amb més variació
+        (\cref{f:dchng_radial_mostvar}),
+        sembla que els valors dels metabòlits alanina, isoleucina, leucina,
+        i en menor grau l'oxaloacètic,
+        són els que presenten majors diferències entre clústers.
+
+        Sembla, per tant, que els clústers trobats poden tenir certa interpretabilitat biològica.
+        Seria necessari estudiar-ho amb més profunditat.
+
+
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{private_dataset/cluster_heatmap/clusters.png}
+            \caption[Comparació dels clústers pel conjunt de dades \gls{privades}]{
+                Comparació dels clústers trobats pels diferents mètodes avaluats
+                sobre el conjunt de dades \gls{privades}.
+            }
+            \label{f:dchng_heatmap}
+        \end{figure}
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{private_dataset/radialplots/covariates.png}
+            \caption[Distribució diferencial de les covariables a \gls{privades}]{
+                Representació de la distribució diferencial
+                de les covariables del conjunt de dades \gls{privades}
+                en funció dels clústers trobats pels diferents mètodes avaluats.
+            }
+            \label{f:dchng_radial_covars}
+        \end{figure}
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{private_dataset/radialplots/most_var_feat.png}
+            \caption[Distribució diferencial dels metabòlits amb més variància a \gls{privades}]{
+                Representació de la distribució diferencial
+                dels metabòlits amb més variància del conjunt de dades \gls{privades}
+                en funció dels clústers trobats pels diferents mètodes avaluats.
+            }
+            \label{f:dchng_radial_mostvar}
+        \end{figure}
+
+
+        \begin{sidewaystable}[p]
+            \small
+            \centering
+            \begin{tabular}{@{}lllllllllll@{}}
+                \toprule
+                \textbf{Tipus} & \textit{\textbf{Feature learning}} & \textit{\textbf{Clustering}} & \textbf{Inicialització} & \textbf{\begin{tabular}[c]{@{}l@{}}Núm.\\ clústers\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Covariable\\ referència\end{tabular}} & \textbf{Acc.} & \textbf{ARI} & \textbf{AMI} & \textbf{Sil.} & \textbf{\begin{tabular}[c]{@{}l@{}}Mateix\\ clúst.\end{tabular}} \\ \midrule
+                \multirow{18}{*}{Clàssic} & \multirow{6}{*}{-} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.25 & 0.47 \\
+                &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.09 & 0.21 \\
+                &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0 & 0 & 0.17 & 0.33 \\
+                &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.1 & 0.17 \\
+                &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.24 & 0.46 \\
+                &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.11 & 0.18 \\
+                & \multirow{6}{*}{PCA} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.29 & 0.47 \\
+                &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.12 & 0.2 \\
+                &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0.01 & 0.01 & 0.14 & 0.24 \\
+                &  &  & - & 3 & CVrisk3 & 0.37 & 0 & 0 & 0.02 & 0.12 \\
+                &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.38 & 0.75 \\
+                &  &  & - & 3 & CVrisk3 & 0.35 & 0 & 0 & 0.1 & 0.24 \\
+                & \multirow{6}{*}{\begin{tabular}[c]{@{}l@{}}Selecció \\ de variables\\ +\\ PCA\end{tabular}} & \multirow{2}{*}{K-Means} & - & 2 & gender & 0.55 & 0 & 0 & 0.32 & 0.48 \\
+                &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.14 & 0.2 \\
+                &  & \multirow{2}{*}{GMM} & - & 2 & gender & 0.55 & 0.01 & 0.01 & 0.16 & 0.25 \\
+                &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.02 & 0.14 \\
+                &  & \multirow{2}{*}{Agglo.} & - & 2 & gender & 0.55 & 0 & 0 & 0.28 & 0.41 \\
+                &  &  & - & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.22 & 0.39 \\
+                \multirow{4}{*}{\textit{\begin{tabular}[c]{@{}l@{}}Deep\\ clustering\end{tabular}}} & \multirow{2}{*}{DEC} & DEC & K-Means & 2 & gender & 0.55 & 0 & 0 & 0.96 & 0.35 \\
+                &  & DEC & K-Means & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.93 & 0.15 \\
+                & \multirow{2}{*}{VaDE} & VaDE & GMM & 2 & gender & 0.55 & 0 & 0 & 0.57 & 0.3 \\
+                &  & VaDE & GMM & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.45 & 0.2 \\ \bottomrule
+            \end{tabular}
+            \caption[Dades \gls{privades}: resultats]{Resum dels resultats obtinguts sobre el cojunt de dades metabolòmiques \gls{privades}}
+            \label{t:dadespriv_results}
+        \end{sidewaystable}
 
 
 
 
-\todo{Presentar resultats: resum de les mètriques, taules mètriques, gràfiques.}
+
 
 \chapter{Discussió}
 \label{c:discussio}
     %Discussió dels resultats en el context del projecte. És en aquest apartat on cobren sentit i en el qual es responen les preguntes de recerca i es mostra com els resultats donen resposta als problemes plantejats.
     %Aquesta part pot ser que no apliqui segons el tipus de treball.
 
-\todo{Discutir avantatges i inconvenients dels mètodes de DC.
-    \begin{itemize}
-        \item DEC: silhouette! aconsegueix clusters molt tight.
-        \item VaDE: model generatiu
-    \end{itemize}
+    Els resultats obtinguts amb les dades \gls{mnist}
+    mostren que els models de \textit{deep clustering}
+    obtenen en general millor \gls{qc} que les tècniques clàssiques.
+    Això suggereix que són capaços d'aprendre \gls{lf} més eficients
+    degut a la seva capacitat de trobar relacions no lineals.
 
-    Per cada dataset: comparar assignacions entre mètodes. Hi ha un acord?
+    El model \gls{dec} obté uns clústers molt similars
+    als aconseguits aplicant tècniques clàssiques a la \gls{cr} d'un \gls{ae},
+    però aconsegueix millor \gls{qc}.
+    Els models basats en \gls{vae} no aconsegueixen un bon rendiment.
 
-    Per cada dataset: possible intepretació dels clústers? (gràfiques multivariants)
-}
+    Els models que han obtingut millor rendiment
+    són els \gls{dec} i \gls{vade}.
+    La resta de models s'han descartat
+    de la resta de l'estudi.
+
+
+    \paragraph{Model \gls{dec}}
+        El model \gls{dec} ha aconseguit generar
+        els clústers amb millors puntuacions per la mètrica silueta,
+        amb diferència.
+        Això indica que la \gls{cr} té una gran capacitat
+        de separar les observacions en funció dels clústers aconseguits.
+
+        Per altra banda,
+        aquest model mostra ser especialment sensible
+        als paràmetres amb que s'inicialitza.
+        En conseqüència,
+        el seu rendiment depèn de que les \gls{lf} apreses durant la fase de pre-entrenament
+        propiciïn una bona \gls{qc} amb els mètodes clàssics
+        utilitzats per inicialitzar els paràmetres.
+
+        Durant la fase d'ajustament del model,
+        s'accentua el criteri utilitzat per separar els clústers inicials,
+        de manera que no s'obté nova informació,
+        però s'aconsegueixen clústers més comprimits,
+        resultant en una millor \gls{qc}.
+
+
+    \paragraph{Model \gls{vade}}
+        La principal característica del model \gls{vae}
+        és que la seva \gls{cr} es basa en un model probabilístic
+        i per tant no determina punts fixos en un espai dimensional,
+        sinó els paràmetres d'una distribució normal multivariant
+        de la qual es mostregen punts aleatoris.
+        Això aconsegueix que la \gls{cr} sigui contínua
+        i per tant pugui funcionar com un model generatiu,
+        mostrejant punts de la distribució latent
+        i passant-los al descodificador
+        per obtenir una nova observació artificial
+        que hauria de compartir la distribució de les variables originals.
+
+        S'ha trobat que els models basats en \gls{vae}
+        no aconsegueixen una bona \gls{qc}.
+        Això és degut a l'aleatorietat del model probabilístic
+        i el fet que tots els punts comparteixin la mateixa distribució latent.
+        En conseqüència,
+        encara que el model pugui ser capaç de diferenciar grups,
+        és difícil aconseguir clústers que no presentin solapament.
+
+        Aquesta idea queda il·lustrada a la \cref{f:vaedec_comp},
+        on es comparen els models VAE+DEC que mantenen o descarten el descodificador:
+        el model que el manté el descodificador,
+        i per manté la funció de cost de regularització durant l'entrenament
+        obté clústers molt més laxos i que presenten major solapament
+        (el que es tradueix en puntuacions més baixes per la mètrica silueta)
+        en comparació amb el model que descarta el descodificador,
+        i per tant s'entrena únicament amb la funció de cost de \textit{clustering}.
+
+        El model \gls{vade} resol aquest problema
+        assignant una distribució independent a cada grup.
+        D'aquesta manera es manté la capacitat generativa del model \gls{vae}.
+        A la \cref{f:vaevadedec_comp} es mostra gràficament
+        la diferència entre les representacions obtingudes pels dos models
+        sobre les dades \gls{mnist}.
+
+        No s'han explorat les característiques generatives
+        del model \gls{vade},
+        que juntament amb la seva capacitat d'obtenir una bona \gls{qc}
+        el converteixen en un model interessant.
+
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{mnist/tsne_embeddings/vaedec_comparison.png}
+            \caption[Comparació dels models VAE+DEC]{
+                Comparació dels models VAE+DEC.
+                Representació \gls{tsne} de la \gls{cr} del model \gls{vae} pre-entrenat (\textbf{esquerra}),
+                del model combinat que perd el descodificador (\textbf{centre})
+                i del model combinat que manté el descodificador (\textbf{dreta}).
+                S'observa una clara millora en la \gls{qc} obtinguda pel model que perd el descodificador.
+            }
+            \label{f:vaedec_comp}
+        \end{figure}
+
+
+    \paragraph{Dades metabolòmiques i interpretació biològica}
+        Al aplicar les tècniques sobre les dades metabolòmiques,
+        el rendiment de les tècniques de \textit{deep clustering}
+        no sembla millorar respecte a les tècniques clàssiques.
+        Segurament això és degut a que aquestes dades presenten
+        una estructura molt més complexa
+        que és difícil de modelar inclús pels models de \textit{deep clusteirng}.
+
+        S'ha observat que els clústers trobats per les diferents tècniques
+        (i números de clústers)
+        presenten en general un bon solapament,
+        és a dir que agrupen les observacions de manera similar.
+        Això seria indicatiu de que existeix algun tipus d'estructura latent a les dades.
+
+        La major dificultat s'ha presentat
+        alhora de donar una interpretació als grups trobats,
+        donat que presenten distribucions multivariants complexes.
+        Encara que les dades \gls{privades} mostren
+        uns resultats que apunten a una possible interpretació biològica,
+        seria necessari un estudi addicional per confirmar-ho.
+
+        Un estudi més profund d'aquestes distribucions
+        podria ajudar a trobar un criteri més clar
+        amb el que valorar l'efectivitat de les diferents tècniques.
+
+        Per tant,
+        es considera que des del punt de vista de la interpretació biològica
+        els resultats són poc concloents
+        i requeririen un estudi més profund.
+
+
 
 \chapter{Valoració econòmica}
 \label{c:economic}
@@ -2065,29 +2444,169 @@ A maximum of 250 words, detailing the purpose, context of application, methodolo
         %    \end{itemize}
         %\end{itemize}
 
-\todo{Conclusions: DC aporta alguna cosa que no es pot aconseguir amb tècniques clàssiques?
-Problema intepretabilitat de les dades metabolòmiques?}
+        De manera sintetitzada,
+        les conclusions que s'han extret en aquest \gls{tfm} són:
+
+        \begin{itemize}
+            \item Els models de \textit{deep clustering}
+            tenen la capacitat de superar el rendiment de les tècniques clàssiques,
+            a costa d'un augment significatiu de la complexitat del model.
+
+            \item El model \gls{dec} destaca per aconseguir clústers molt estrets,
+            però és molt sensible als paràmetres amb què s'inicialitza.
+
+            \item El model \gls{vade} aconsegueix una bona \gls{qc},
+            i a més té la capacitat de funcionar com un model generatiu.
+
+            \item L'arquitectura \gls{vae} no propicia una bona \gls{qc}
+            donat que la \gls{cr} està acotada a una única distribució latent,
+            compartida per totes les observacions.
+
+            \item Tots els mètodes avaluats sobre les dades metabolòmiques
+            (\gls{kmeans}, \gls{gmm}, \gls{aglo}, \gls{dec}, \gls{vade})
+            mostren un alt nivell de solapament dels clústers trobats.
+            És a dir, troben una estructura latent de les dades similar.
+
+            \item Encara que els clústers obtinguts
+            mostren certes diferències en la distribució multivariant
+            de les covariables d'interès,
+            la seva interpretació és complexa
+            i requeriria d'un estudi posterior.
+        \end{itemize}
+
+        Els resultats obtinguts es consideren satisfactoris
+        i es considera que s'han aconseguit els objectius inicials.
+
+        La implementació dels models de \textit{deep learning}
+        he resultat una tasca més complicada del que s'esperava,
+        però finalment s'ha aconseguit.
+
+        El temps disponible per realitzar aquest \gls{tfm}
+        ha fet necessari limitar l'anàlisi que s'ha fet dels resultats obtinguts.
+        A la següent secció es presenten una sèrie de idees
+        que no ha donat temps d'estudiar.
+
 
 
     \section{Línies de futur}
     \label{s:futur}
         %Les línies de treball futur que no s'han pogut explorar en aquest treball i han quedat pendents.
 
-\todo{Plantejar tot el que no s'ha fet o idees adicionals:
-\begin{itemize}
-    \item Dades privades: no s'ha tingut en compte mesures repetides en el temps.
+        Durant el desenvolupament d'aquest \gls{tfm}
+        han sorgit diverses idees que no s'han pogut explorar
+        donada la limitació de temps disponible.
 
-    Separar les dades segons temps. Utilitzar un temps per entrenament i els altres per validació. Cross-validation cambiant els grups.
+        Algunes d'aquestes idees es podrien desenvolupar
+        en estudis posteriors.
+        Es fan les següents propostes:
 
-    Separar les dades segons temps. Clustering sobre cada grup. Comparar assignacions. Hi ha solapament?
+        \paragraph{Dades \gls{privades}}
+            En l'estudi del conjunt de dades \gls{privades}
+            no s'ha tingut en compte que es tracta de mesures repetides en el temps.
+            Concretament,
+            es disposa de tres mesures realitzades sobre els mateixos individus.
 
-    Estudi multivariant dels resultats que tingui en compte que són mesures repetides.
-    \item ExposomeChall.: AE amb dues entrades (serum, orina).
-    \item Utilitzar VAE o VaDE per generar noves dades. Entrenar models amb aquestes dades. Millor rendiment? Es respecten les assignacions inicials?
-    \item Estudi multivariant dels clusters resultants -> possible interpretació?
-    \item Model "mixture of experts" que compili els resultats de diversos mètodes.
-    \item LIMITACIÓ: Nº de clusters. Buscar K òptima?
-\end{itemize}}
+            Es proposa estudiar les tècniques de \textit{deep clustering} avaluades,
+            entrenant els models amb les dades d'un dels temps
+            i avaluant els resultats amb les dades dels altres dos temps.
+            Fent el mateix per els altres dos grups,
+            es pot realitzar validació creuada.
+
+            Una segona proposta és separar les dades en tres subconjunts en funció del temps,
+            aplicar les tècniques de \textit{clustering} sobre cada subcojunt per separat
+            i comparar les assignacions obtingudes.
+            S'esperaria observar major variació entre individus
+            que entre les observacions del mateix individu.
+            Per tant, s'esperaria que trobar un fort solapament entre els clústers:
+            el mateix individu s'hauria d'assignar al mateix clúster en els diferents temps.
+
+            Per últim,
+            es proposa estudiar la interpretació biològica dels clústers obtinguts
+            mitjançant un estudi multivariant per mesures repetides.
+
+        \paragraph{Exposome Data Challenge Event}
+            Es tracta d'un conjunt de dades molt complexe
+            compost per dades de diversos orígens,
+            pel que les possibilitats d'estudi són molt àmplies.
+
+            Una aproximació que no s'ha realitzat en aquest \gls{tfm}
+            per falta de temps és
+            implementar un model basat en un \gls{ae}
+            que tingui dues entrades.
+            El model es compondria per dos (o múltiples) codificadors paral·lels.
+            Les capes de representació es combinarien concatenant
+            les respectives capes neuronals,
+            i posteriorment es podria aplicar \textit{clustering}
+            mitjançant tècniques clàssiques o un model \gls{dec}.
+
+            Cada un dels codificadors tindrien com entrada un subconjunt de dades,
+            per exemple les dades metabolòmiques de sèrum i d'orina,
+            les dades metabolòmiques i les dades del exposoma,
+            o algun dels subconjunts de dades òmiques i un dels subconjunts de covariables.
+            D'aquesta manera es podria obtenir informació sobre una estructura latent
+            condicionada simultàniament a diversos conjunts de dades.
+
+            Els codificadors es podrien aconseguir entrenant dos \gls{ae} per separat,
+            i després unint-los,
+            o implementant directament un \gls{ae} amb dues entrades i dues sortides.
+
+        \paragraph{Models generatius}
+            Els models \gls{vae} i \gls{vade} es caracteritzen
+            per la seva capacitat generativa:
+            es poden generar noves dades artificials
+            prenent mostres de la distribució de la seva capa latent
+            i passant-les pel descodificador del model.
+
+            Donat que una de les limitacions de les dades metabolòmiques
+            (i òmiques en general)
+            és que solen tenir un número reduït de mostres,
+            es proposa estudiar la viabilitat d'utilitzar aquests models
+            com a tècnica d'augment de les dades,
+            ja sigui per realitzar estudis de \textit{clustering}
+            o aplicar altres mètodes d'anàlisi.
+
+        \paragraph{Model barreja d'experts}
+            Una altra idea que no ha donat temps d'estudiar en aquest \gls{tfm}
+            és desenvolupar un model tipus \textit{mixture of experts}.
+            Un cop implementats i seleccionats els models individuals de \textit{clustering},
+            es podria aplicar un mètode per unificar les assignacions
+            de clústers a un sol criteri.
+
+            Això podria realitzar-se de manera més o menys senzilla,
+            assignant a cada observació el clúster que mostri més solapament
+            entre les diferents tècniques,
+            o mitjançant una xarxa neuronal més complexa
+            que combini els diversos models en una sola sortida.
+
+        \paragraph{Interpretació dels clústers}
+            En aquest \gls{tfm} no s'ha estudiat amb profunditat
+            la possible interpretació biològica dels clústers.
+            Es proposa realitzar un estudi més rigorós
+            analitzant la distribució multivariant diferencial en funció dels clústers obtinguts.
+
+        \paragraph{Número de clústers}
+            Per últim,
+            es planteja una limitació important de totes les tècniques avaluades
+            en aquest \gls{tfm}:
+            la selecció d'un nombre de clústers òptim.
+
+            Excepte el mètode aglomeratiu,
+            tots els mètodes utilitzats requereixen fixar prèviament un nombre de clústers.
+            Sovint no és factible conèixer el número de clústers per endavant,
+            precisament perquè l'objectiu de les tècniques de \textit{clustering}
+            és buscar una estructura latent desconeguda.
+
+            En aquest sentit, s'ha de manera superficial l'eina \textit{clValid}\footnote{https://www.rdocumentation.org/packages/clValid/versions/0.7/topics/clValid},
+            un paquet de R que permet avaluar simultàniament
+            diverses tècniques de \textit{clustering} clàssiques
+            mesurant diferents mètriques internes, d'estabilitat i biològiques.
+
+            Es proposa estudiar el conjunt de dades Exposome Data Challenge Event
+            amb l'objectiu de trobar un número de clústers òptim
+            que admeti la seva interpretació.
+            Posteriorment es podria tornar a avaluar els diferents mètodes
+            en funció del seu alineament amb aquesta interpretació.
+
 
     \section{Seguiment de la planificació}
     \label{s:seguiment}
@@ -2113,6 +2632,21 @@ Problema intepretabilitat de les dades metabolòmiques?}
 \bibliographystyle{ieeetr}
 \bibliography{TFM, TFM-software}
 
+%\chapter*{Agraïments}
+%
+%    M'agradaria expressar el meu agraïment a Esteban Vegas Lozano,
+%    el meu tutor en aquest \gls{tfm},
+%    pel temps dedicat a llegir esborranys de la memòria
+%    i els meus e-mails amb múltiples capítols,
+%    així com pel suport que m'ha donat aportant idees molt valuoses
+%    i tranquil·litzant-me en els moments complicats
+%    en que els resultats no semblaven sortir.
+%
+%    També vull agrair a l'equip de recerca
+%    \textit{Biomarkers and Nutritional \& Food Metabolomics}
+%    del Departament de Nutrició, Ciències de l'Alimentació i Gastronomia
+%    de la Universitat de Barcelona
+%    que hagi compartit desinteressadament el conjunt de dades \gls{privades}.
 
 \newpage
 \appendix
@@ -2120,6 +2654,7 @@ Problema intepretabilitat de les dades metabolòmiques?}
 %Depenent del tipus de treball, és possible que no calgui afegir cap annex.
 
 \chapter{Exposome Data Challenge Event: resultats complets}
+\label{a:exposome}
 
     \section{Gràfiques radials}
 
@@ -2234,17 +2769,17 @@ Problema intepretabilitat de les dades metabolòmiques?}
 %            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_mostvarfeat_k6.png}
 %            \includegraphics[width=\textwidth]{exposome_challenge/radialplots/exposome_corr_mostvarfeat_k7.png}
 %
-%    \section{Heatmaps}
-%
-%        A continuació es mostren les comparacions
-%        de les assignacions de clústers per cada mostra,
-%        agrupades en funcio del conjunt de dades
-%        sobre el que s'han aplicat els mètodes de \textit{clustering}.
-%
-%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/metabol_uncorrected.png}
-%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/metabol_corrected.png}
-%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/exposome_uncorrected.png}
-%        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/exposome_corrected.png}
+    \section{Heatmaps}
+
+        A continuació es mostren les comparacions
+        de les assignacions de clústers per cada mostra,
+        agrupades en funcio del conjunt de dades
+        sobre el que s'han aplicat els mètodes de \textit{clustering}.
+
+        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/metabol_uncorrected.png}
+        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/metabol_corrected.png}
+        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/exposome_uncorrected.png}
+        \includegraphics[width=\textwidth]{exposome_challenge/heatmap_clusters/exposome_corrected.png}
 
 
     \section{Taules de mètriques}
@@ -2882,27 +3417,6 @@ Problema intepretabilitat de les dades metabolòmiques?}
         \label{t:results_exposome10}
     \end{table}
 
-
-\chapter{Dades privades: resultats complets}
-
-    \section{Gràfiques radials}
-
-    Representació gràfica de la distribució multivariant
-    de les dades del covariables,
-    segons dels clústers trobats:
-
-    \includegraphics[width=\textwidth]{private_dataset/radialplots/covariates.png}
-
-    Representació gràfica de la distribució multivariant
-    de les dades de les variables amb major variància,
-    segons dels clústers trobats:
-
-    \includegraphics[width=\textwidth]{private_dataset/radialplots/most_var_feat.png}
-
-%
-%
-%\chapter{Exemple d'annex}
-%    \section{Annex B}
 
 
 \end{document}
