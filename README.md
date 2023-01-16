@@ -1,12 +1,7 @@
-# NOTA ALS PROFESSORS
-
-Aquest repositori s'està actualitzant contínuament a mesura que avança el projecte.
-Els arxius en l'estat corresponent a l'entrega de la PAC3 es poden trobar a
-[https://github.com/carlescn/MSc_bioinformatics_thesis/tree/PAC3](https://github.com/carlescn/MSc_bioinformatics_thesis/tree/PAC3)
-
 # Deep clustering models for metabolomics data
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3.0-blue.svg?logo=)](https://github.com/carlescn/MSc_bioinformatics_thesis/blob/main/LICENSE)
+[![made-with-latex](https://img.shields.io/badge/Made%20with-Latex-1f425f.svg?logo=latex)](https://www.latex-project.org/)
 [![made-with-python 3.9](https://img.shields.io/badge/Made%20with-Python%203.9-1f425f.svg?logo=python)](https://www.python.org/)
 [![tensorflow 2.9.1](https://img.shields.io/badge/Tensorflow-2.9.1-green.svg?logo=tensorflow)](https://github.com/tensorflow/tensorflow)
 [![keras 2.9.0](https://img.shields.io/badge/Keras-2.9.0-green.svg?logo=keras)](https://github.com/keras-team/keras)
