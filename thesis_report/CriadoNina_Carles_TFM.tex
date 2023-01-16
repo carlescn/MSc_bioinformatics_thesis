@@ -773,10 +773,10 @@
 
         \begin{figure}
             \centering
-            \includegraphics[width=\textwidth]{michelucci2022_autoencoder.png}
+            \includegraphics[width=0.7\textwidth]{xie2015_dec.pdf}
             \caption[Arquitectura del model DEC mantenint]{
                 Esquema de l'arquitectura del model \gls{dec}.
-                Font: Xie \textit{et. al.}, 2015 \citep{xie2015_dec}
+                Font: Xie \textit{et. al.}, 2015 \citep{Xie2015}
             }
             \label{f:dec_xie2015}
         \end{figure}
@@ -2245,6 +2245,8 @@
         per cada tècnica
         la mitjana de les mètriques obtingudes
         sobre els diferents números de clústers fixats.
+        A la \cref{s:metodologia} s'explica amb més detall
+        com interpretar aquesta gràfica.
         Els resultats complets s'adjunten al \cref{a:exposome}.
 
         Al comparar els clústers trobats per les diferents tècniques,
@@ -2471,7 +2473,9 @@
                 & \multirow{2}{*}{VaDE} & VaDE & GMM & 2 & gender & 0.55 & 0 & 0 & 0.57 & 0.3 \\
                 &  & VaDE & GMM & 3 & CVrisk3 & 0.36 & 0 & 0 & 0.45 & 0.2 \\ \bottomrule
             \end{tabular}
-            \caption[Dades DCH-NG: resultats]{Resum dels resultats obtinguts sobre el cojunt de dades metabolòmiques \gls{privades}}
+            \caption[Dades DCH-NG: resultats]{Resum dels resultats obtinguts sobre el cojunt de dades metabolòmiques \gls{privades}.
+            \textit{(Mateix clust.: freqüència amb que les observacions del mateix individu
+            s'assignen a un únic clúster (corregida per la mida del clúster))}}
             \label{t:dadespriv_results}
         \end{sidewaystable}
 
