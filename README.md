@@ -71,6 +71,30 @@ I leveraged the virtual machines provided by
   Folder that contains some Jupyter Notebooks I wrote 
   while training myself on the use of Keras and Tensorflow.
   
+## Required software
+
+The DNNs provided here are implemented using
+Python and Keras over Tensorflow.
+
+The implementation of the models
+defined in the module models.py
+requires the following python packages:
+
+- python >= 3.9
+- tensorflow >= 2.9.1
+- keras >= 2.9.0
+- numpy
+
+To reproduce the provided notebooks,
+you will also need:
+
+- matplotlib
+- numpy
+- pandas
+- scikit-learn
+- scipy
+- seaborn
+
 ## Abstract
 
 I implemented several deep clustering models 
