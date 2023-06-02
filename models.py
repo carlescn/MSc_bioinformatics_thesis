@@ -207,15 +207,15 @@ class VAE(models.Model):
     def train_step(self, x):
         with tf.GradientTape() as tape:
             recon_x, z_mu, z_logvar = self(x)
-            regularizatoin_loss = self.regularization_loss(z_mu, z_logvar)
+            regularization_loss = self.regularization_loss(z_mu, z_logvar)
             reconstruction_loss = self.reconstruction_loss(x, recon_x)
-            total_loss = regularizatoin_loss + reconstruction_loss
+            total_loss = regularization_loss + reconstruction_loss
             
         gradients = tape.gradient(total_loss, self.trainable_weights)
         self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
 
         self.total_loss_tracker.update_state(total_loss)
-        self.regularization_loss_tracker.update_state(regularizatoin_loss)
+        self.regularization_loss_tracker.update_state(regularization_loss)
         self.reconstruction_loss_tracker.update_state(reconstruction_loss)
 
         return {"total_loss": self.total_loss_tracker.result(),
@@ -269,7 +269,7 @@ class ClusteringVAE(VAE):
         self.optimizer.apply_gradients(zip(gradients, self.trainable_weights))
 
         self.total_loss_tracker.update_state(total_loss)
-        self.regularization_loss_tracker.update_state(regularizatoin_loss)
+        self.regularization_loss_tracker.update_state(regularization_loss)
         self.reconstruction_loss_tracker.update_state(reconstruction_loss)
         self.clustering_loss_tracker.update_state(clustering_loss)
         
